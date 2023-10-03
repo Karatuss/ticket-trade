@@ -1,6 +1,6 @@
 <!--
 *** Thanks for checking out the Best-README-Template. If you have a suggestion
-*** that would make this better, please fork the repo and create a pull request
+*** that would make this better, please fork the ticket-trade and create a pull request
 *** or simply open an issue with the tag "enhancement".
 *** Thanks again! Now go create something AMAZING! :D
 ***
@@ -25,7 +25,6 @@
 [![Stargazers][stars-shield]][stars-url]
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
-[![LinkedIn][linkedin-shield]][linkedin-url]
 
 
 
@@ -39,11 +38,12 @@
   <h3 align="center">Ticket Trade</h3>
 
   <p align="center">
-    캡스톤 디자인 프로젝트 (이후 내용 추가하기)
+    Anybody can create a ticket trade for his/her own event with preventing from scalped tickets.
     <br />
     <a href="https://github.com/TwoPair/ticket-trade"><strong>Explore the docs »</strong></a>
     <br />
     <br />
+    <!-- 나중에 데모 사이트 같은거 만들어서 보여주는 것도 나쁘지 않아보임. 링크 수정도 필요함. -->
     <a href="https://github.com/TwoPair/ticket-trade">View Demo</a>
     ·
     <a href="https://github.com/TwoPair/ticket-trade/issues">Report Bug</a>
@@ -107,15 +107,12 @@ To get a local copy up and running follow these simple steps.
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
+Please follow the official hyperledger-fabric document.
+[https://hyperledger-fabric.readthedocs.io/en/latest/prereqs.html](https://hyperledger-fabric.readthedocs.io/en/latest/prereqs.html)
 
 ### Installation
 
-1. Clone the repo
+1. Clone the ticket-trade
    ```sh
    git clone https://github.com/TwoPair/ticket-trade.git
    ```
@@ -131,6 +128,7 @@ This is an example of how to list things you need to use the software and how to
 
 Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
 
+<!-- 위키도 구성해보면 좋을 듯 -->
 _For more examples, please refer to the [Documentation](https://example.com)_
 
 
@@ -143,6 +141,7 @@ See the [open issues](https://github.com/TwoPair/ticket-trade/issues) for a list
 
 
 <!-- CONTRIBUTING -->
+<!-- 꼭 필요할까 -->
 ## Contributing
 
 Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
@@ -165,7 +164,9 @@ Distributed under the MIT License. See `LICENSE` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Your Name - [@twitter_handle](https://twitter.com/twitter_handle) - shm1193@gmail.com
+Hyunmin Shin - shm1193@gmail.com
+Youngrae Kim - kyrae604@naver.com
+Sooeung Im   - dlatndmd7@naver.com
 
 Project Link: [https://github.com/TwoPair/ticket-trade](https://github.com/TwoPair/ticket-trade)
 
@@ -184,15 +185,15 @@ Project Link: [https://github.com/TwoPair/ticket-trade](https://github.com/TwoPa
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/TwoPair/repo.svg?style=for-the-badge
-[contributors-url]: https://github.com/TwoPair/repo/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/TwoPair/repo.svg?style=for-the-badge
-[forks-url]: https://github.com/TwoPair/repo/network/members
-[stars-shield]: https://img.shields.io/github/stars/TwoPair/repo.svg?style=for-the-badge
-[stars-url]: https://github.com/TwoPair/repo/stargazers
-[issues-shield]: https://img.shields.io/github/issues/TwoPair/repo.svg?style=for-the-badge
-[issues-url]: https://github.com/TwoPair/repo/issues
-[license-shield]: https://img.shields.io/github/license/TwoPair/repo.svg?style=for-the-badge
-[license-url]: https://github.com/TwoPair/repo/blob/master/LICENSE.txt
+[contributors-shield]: https://img.shields.io/github/contributors/TwoPair/ticket-trade.svg?style=for-the-badge
+[contributors-url]: https://github.com/TwoPair/ticket-trade/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/TwoPair/ticket-trade.svg?style=for-the-badge
+[forks-url]: https://github.com/TwoPair/ticket-trade/network/members
+[stars-shield]: https://img.shields.io/github/stars/TwoPair/ticket-trade.svg?style=for-the-badge
+[stars-url]: https://github.com/TwoPair/ticket-trade/stargazers
+[issues-shield]: https://img.shields.io/github/issues/TwoPair/ticket-trade.svg?style=for-the-badge
+[issues-url]: https://github.com/TwoPair/ticket-trade/issues
+[license-shield]: https://img.shields.io/github/license/TwoPair/ticket-trade.svg?style=for-the-badge
+[license-url]: https://github.com/TwoPair/ticket-trade/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/TwoPair
