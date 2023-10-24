@@ -16,11 +16,11 @@ import java.util.List;
 
 import static com.ticket.Ticketing.Ticketing.cluster;
 
-
 @Service
 @AllArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+
     // CREATE
     private UserDocument createUserDocument(UserDto userDto){
         return UserDocument.builder()

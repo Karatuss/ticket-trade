@@ -11,7 +11,6 @@ import org.springframework.data.couchbase.core.mapping.id.GeneratedValue;
 import org.springframework.data.couchbase.core.mapping.id.GenerationStrategy;
 
 import java.util.List;
-
 // To remember data format
 
 @Builder

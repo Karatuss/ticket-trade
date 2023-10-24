@@ -1,6 +1,5 @@
 package com.ticket.Ticketing;
 
-
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.ClusterOptions;
 import com.ticket.Ticketing.domain.document.SeatDocument;
@@ -26,6 +25,7 @@ public class Ticketing {
 				connStr,
 				ClusterOptions.clusterOptions("adminuser", "adminuser")
 		);
+    
 		// create seat
 		seatService = new SeatService();
 		seatService.createSeatDocuments();
