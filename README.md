@@ -110,22 +110,26 @@ To get a local copy up and running follow these simple steps.
 Please follow the official hyperledger-fabric document.
 [https://hyperledger-fabric.readthedocs.io/en/latest/prereqs.html](https://hyperledger-fabric.readthedocs.io/en/latest/prereqs.html)
 
+- Hyperledger fabric 2.5.0
+- Docker Desktop 4.23.0
+- Spring boot **Version 써주기**
+- **여타 다른거 추가하기**
 
-#### Setting for using couchbase
-> - Docker
->```
->docker run -d --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase:community-6.5.0
->```
+#### CouchBase Setting
 
-> - IntelliJ IDEA
->     - Run > Edit Configurations > Modify Options > *CHECK* Add VM options 
->     - INPUT 
->       - > -Dcom.sun.management.jmxremote.port=9000 \
->         > -Dcom.sun.management.jmxremote.authenticate=false \
->         > -Dcom.sun.management.jmxremote.ssl=false
+- Docker
+```
+docker run -d --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase:community-6.5.0
+```
 
-
-
+- IntelliJ IDEA
+  - Run > Edit Configurations > Modify Options > ☑️ Add VM options 
+  - INPUT
+    ```
+    -Dcom.sun.management.jmxremote.port=9000 \
+    -Dcom.sun.management.jmxremote.authenticate=false \
+    -Dcom.sun.management.jmxremote.ssl=false
+    ```
 
 ### Installation
 
@@ -133,9 +137,9 @@ Please follow the official hyperledger-fabric document.
    ```sh
    git clone https://github.com/TwoPair/ticket-trade.git
    ```
-2. Install NPM packages
+2. Run the launcher **아직 안 만들었다. 전체 프로그램 동작시킬 런처 만들기!**
    ```sh
-   npm install
+   ./launcher
    ```
 
 
