@@ -1,0 +1,19 @@
+.seating-row {
+    display: flex;
+    margin-bottom: 10px;
+  }
+  .seat {
+    width: 40px;
+    height: 40px;
+    margin-right: 5px;
+    background-color: #ccc;
+    cursor: pointer;
+  }
+  .selected {
+    background-color: #ff5722;
+    pointer-events: none;
+  }
+  .reserved {
+    background-color: #999;
+    pointer-events: none;
+  }
