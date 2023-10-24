@@ -16,11 +16,8 @@ import org.springframework.data.couchbase.core.mapping.id.GenerationStrategy;
 @Document
 public class SeatDocument {
     @Id
-    @GeneratedValue(strategy = GenerationStrategy.UNIQUE)
+    @GeneratedValue(strategy = GenerationStrategy.USE_ATTRIBUTES)
     final String id;
-
-    @Field
-    String seatNum;
 
     @Field
     Boolean sold;

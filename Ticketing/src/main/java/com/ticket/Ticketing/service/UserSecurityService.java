@@ -34,7 +34,7 @@
 //        UserDocument siteUser = _siteUser.get();//해당 유저 엔티티를 Optional 객체에서 꺼냄
 //        List<GrantedAuthority> authorities = new ArrayList<>();
 //        if ("admin".equals(userinfo.get("role"))) {//사용자명이 admin 인 경우 ADMIN 권한 부여
-//            authorities.add(new SimpleGrantedAuthority(Role.ROLE_ADMIN.getDescription()));
+//            authorities.add(new SimpleGrantedAuthority(Role.ADMIN.getDescription()));
 //
 //        } else {//그 외엔 USER 권한 부여
 //            authorities.add(new SimpleGrantedAuthority(Role.ROLE_MEMBER.getDescription()));

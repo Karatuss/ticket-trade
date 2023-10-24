@@ -10,6 +10,7 @@ import org.springframework.data.couchbase.core.mapping.Field;
 import org.springframework.data.couchbase.core.mapping.id.GeneratedValue;
 import org.springframework.data.couchbase.core.mapping.id.GenerationStrategy;
 
+import java.util.List;
 // To remember data format
 
 @Builder
@@ -38,6 +39,9 @@ public class UserDocument {
 
     @Field
     String phoneNumber;
+
+    @Field
+    List<String> seat;
 
     @Field
     Role role;

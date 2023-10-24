@@ -1,17 +1,18 @@
 document.getElementById("logout").addEventListener("click",function(){
 
-    var logout = {logout : true};
+    var logout = JSON.stringify({logout : true});
 
-    fetch('url', {
-        // POST 요청을 보냄
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json")
+
+    var requestOptions = {
         method: 'POST',
-        // 파일이 JSON형식임을 명시
-        headers: {
-            'Content-Type' : 'application/json'
-        },
-        // data의 정보를 JSON 형식으로 만들어 서버로 전송
-        body: JSON.stringify(logout)
-    })
+        headers: myHeaders,
+        body: logout,
+        redirect: 'follow'
+    };
+
+    fetch('http://localhost:8080/seat', requestOptions)
     .then(response => {
         if(!response.ok) {
             throw new Error('네트워크 오류');

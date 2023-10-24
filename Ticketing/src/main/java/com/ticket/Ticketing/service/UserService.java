@@ -1,6 +1,10 @@
 package com.ticket.Ticketing.service;
 
 
+import com.couchbase.client.java.Bucket;
+import com.couchbase.client.java.Collection;
+import com.couchbase.client.java.json.JsonObject;
+import com.couchbase.client.java.kv.GetResult;
 import com.ticket.Ticketing.domain.document.UserDocument;
 import com.ticket.Ticketing.domain.repository.UserRepository;
 import com.ticket.Ticketing.dto.UserDto;
@@ -10,8 +14,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.ticket.Ticketing.Ticketing.cluster;
 
-// To revise DAO
 @Service
 @AllArgsConstructor
 public class UserService {
@@ -27,6 +31,7 @@ public class UserService {
                 .password(userDto.getPassword())
                 .phoneNumber(userDto.getPhoneNumber())
                 .gender(userDto.getGender())
+                .seat(userDto.getSeat())
                 .role(userDto.getRole())
 //                .faceImg(couchDto.getFaceImg())
                 .build();
@@ -40,6 +45,18 @@ public class UserService {
             userDtos.add(this.convertDocumentToDto(userDocument));
         }
         return userDtos;
+    }
+
+    public List<String> getBookedSeat(String userId){
+        Bucket userBucket = cluster.bucket("user_bucket");
+        Collection userCollection = userBucket.defaultCollection();
+
+        GetResult userResult = userCollection.get(userId);
+        JsonObject content = userResult.contentAsObject();
+
+        List<String> userSeatList = (List<String>) content.get("seat"); //! 나중에 받은 데이터 seat인지도 확인해야함
+
+        return userSeatList;
     }
 
     // UPDATE & CREATE
@@ -63,6 +80,7 @@ public class UserService {
                 .password(userDocument.getPassword())
                 .phoneNumber(userDocument.getPhoneNumber())
                 .gender(userDocument.getGender())
+                .seat(userDocument.getSeat())
                 .role(userDocument.getRole())
 //                .faceImg(userDocument.getFaceImg())
                 .build();

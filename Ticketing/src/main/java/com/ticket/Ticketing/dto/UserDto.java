@@ -5,6 +5,8 @@ import com.ticket.Ticketing.domain.repository.Gender;
 import com.ticket.Ticketing.domain.repository.Role;
 import lombok.*;
 
+import java.util.List;
+
 // Data transfer object
 
 @Builder
@@ -20,6 +22,7 @@ public class UserDto {
     private String email;
     private Gender gender;
     private String phoneNumber;
+    private List<String> seat;
     private Role role;
 //    private Byte[] faceImg;
 }
