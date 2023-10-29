@@ -5,8 +5,10 @@ import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.ClusterOptions;
 import com.ticket.Ticketing.domain.document.SeatDocument;
 import com.ticket.Ticketing.service.SeatService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 
 import java.util.List;
 
@@ -15,6 +17,7 @@ import java.util.List;
 @SpringBootApplication
 public class Ticketing {
 	// static variables
+
 	private static final String connStr = "127.0.0.1";
 	public static SeatService seatService;
 	public static Cluster cluster;
@@ -38,8 +41,9 @@ public class Ticketing {
 
 		// JVM Shutdown Hook Settings
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-			// delete all seat info for reset  //! 추후 검토 필요
+			// delete all seat info for reset  //TODO 추후 검토 필요
 			seatService.deleteAllSeatDocuments();
+
 			// disconnect cluster when terminating application
 			cluster.disconnect();
 		}));

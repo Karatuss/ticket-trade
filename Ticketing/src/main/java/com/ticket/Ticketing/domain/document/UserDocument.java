@@ -3,6 +3,7 @@ package com.ticket.Ticketing.domain.document;
 
 import com.ticket.Ticketing.domain.repository.Gender;
 import com.ticket.Ticketing.domain.repository.Role;
+import jakarta.validation.constraints.Email;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.couchbase.core.mapping.Document;
@@ -47,6 +48,8 @@ public class UserDocument {
     @Field
     Role role;
 
+    @Field
+    Integer loginAttempts;
 
 
     // Face Image is replaced Id.jpg and Image File is assumed to be stored in another server

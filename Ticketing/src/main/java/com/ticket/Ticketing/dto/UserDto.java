@@ -24,5 +24,6 @@ public class UserDto {
     private String phoneNumber;
     private List<String> seat;
     private Role role;
+    private Integer loginAttempts;
 //    private Byte[] faceImg;
 }

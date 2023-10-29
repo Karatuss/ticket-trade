@@ -1,49 +1,94 @@
 package com.ticket.Ticketing.controller;
 
 
-import com.ticket.Ticketing.domain.document.SeatDocument;
-import com.ticket.Ticketing.dto.SeatDto;
-import com.ticket.Ticketing.service.SeatService;
-import com.ticket.Ticketing.service.UserService;
+import com.ticket.Ticketing.domain.repository.SessionConst;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-
-import java.util.HashMap;
-import java.util.List;
-
-import static com.ticket.Ticketing.controller.PostController.loginUserID;
+import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 
 @Controller
 @AllArgsConstructor
+@SessionAttributes("user")
 public class GetController {
-    private final UserService userService;
-    private final SeatService seatService;
+//    private final UserService userService;
+//    private final SeatService seatService;
 
     @GetMapping("/login")
-    public String login(){
+    public String login(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) String loginUser){
+
+        if(loginUser != null) {
+            return "index";
+        }
+
         return "login";
     }
 
     @GetMapping(value = "/register")
-    public String setRegister(){
+    public String setRegister(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) String loginUser){
+
+        if(loginUser != null) {
+            return "index";
+        }
+
         return "register";
     }
 
-    @GetMapping(value = "/seat")
-    public String setSeat() { return "seat";}
 
+    @GetMapping(value = "/seat")
+    public String setSeat(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) String loginUser,
+                          HttpServletRequest request) {
+        // check login
+        if(loginUser == null) {
+            return "index";
+        }
+
+        // if normally checked login get session
+        HttpSession session = request.getSession(false);
+
+//        session.invalidate(); // for logout because of not making logout button
+
+        // check session is maintained
+        if(session == null){
+            return "index";
+        }
+//        session.setAttribute(SessionConst.LOGIN_MEMBER, loginUserID);
+
+        return "seat";
+    }
+
+    //TODO 로그인 세션 확인 + 매니저만 접근 가능  기능 추가
     @GetMapping(value = "/manage")
     public String manage(){ return "manage"; }
 
-    @GetMapping("/buy-setcolor.js")
-    public ResponseEntity<Object> getSeatData() {
+    //TODO 로그아웃 수행시 세션 삭제
+
+/*
+    @GetMapping("/.js")
+    public ResponseEntity<Object> getSeatData(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) String loginUser,
+                                              HttpServletRequest request) {
         HashMap<String, Object> getData = null;
+
         try {
+            HttpSession session = request.getSession(false);
+
+            // check session is maintained
+            if(session == null){
+                throw new IllegalStateException();
+            }
+//            session.setAttribute(SessionConst.LOGIN_MEMBER, loginUserID);
+
+            // check login user exists
+            if(loginUser == null) {
+                getData.put("UserSeat", null);
+                session.invalidate();
+                throw new LoginException();
+            }
+
             // data.UserSeat
             List<String> userSeatList = userService.getBookedSeat(loginUserID);
 
@@ -84,7 +129,11 @@ public class GetController {
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(getData);
 
-        } catch (NullPointerException e){ // userSeatList or bookedSeat make null exception
+        } catch(IllegalStateException e){ // session error
+          return ResponseEntity.status(HttpStatus.FOUND)
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .body(getData);
+        } catch (NullPointerException | LoginException e) { // userSeatList or bookedSeat make null exception
             return ResponseEntity.status(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(getData);
@@ -101,32 +150,35 @@ public class GetController {
                 .sold(seatDto.getSold())
                 .build();
     }
+    */
 
 
-    // Check member information
-    //! 수정해서 사용하거나 지워질 수도 있음.
-//        @GetMapping(value = "/register/{id}")
-//        public List<Map<String, Object>> getList(@PathVariable String id, String password){
-//                List<UserDto> userDtoList = userService.getList(id, password);
-//
-//                List<Map<String, Object>> userLoginList = new ArrayList<>();
-//                for(UserDto userDto : userDtoList){
-//                        Map<String,Object> result = new HashMap<>();
-//                        result.put("id", userDto.getId());
-//                        result.put("age", userDto.getAge());
-//                        result.put("name", userDto.getName());
-//                        result.put("email", userDto.getEmail());
-//                        result.put("password", userDto.getPassword());
-//                        result.put("phonenumber", userDto.getPhoneNumber());
-//                        result.put("gender", userDto.getGender());
-//                        result.put("role", userDto.getRole());
-////                        result.put("faceimg", userDto.getFaceImg());
-//                        userLoginList.add(result);
-//                }
-//                return userLoginList;
-//        }
+/*
+    //TODO 수정해서 사용하거나 지워질 수도 있음.
 
+     Check member information
+        @GetMapping(value = "/register/{id}")
+        public List<Map<String, Object>> getList(@PathVariable String id, String password){
+                List<UserDto> userDtoList = userService.getList(id, password);
 
+                List<Map<String, Object>> userLoginList = new ArrayList<>();
+                for(UserDto userDto : userDtoList){
+                        Map<String,Object> result = new HashMap<>();
+                        result.put("id", userDto.getId());
+                        result.put("age", userDto.getAge());
+                        result.put("name", userDto.getName());
+                        result.put("email", userDto.getEmail());
+                        result.put("password", userDto.getPassword());
+                        result.put("phonenumber", userDto.getPhoneNumber());
+                        result.put("gender", userDto.getGender());
+                        result.put("role", userDto.getRole());
+//                        result.put("faceimg", userDto.getFaceImg());
+                        userLoginList.add(result);
+                }
+                return userLoginList;
+        }
+
+*/
 
 
 
