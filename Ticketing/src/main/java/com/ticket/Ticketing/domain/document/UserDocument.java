@@ -3,7 +3,6 @@ package com.ticket.Ticketing.domain.document;
 
 import com.ticket.Ticketing.domain.repository.Gender;
 import com.ticket.Ticketing.domain.repository.Role;
-import jakarta.validation.constraints.Email;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.couchbase.core.mapping.Document;
@@ -12,7 +11,6 @@ import org.springframework.data.couchbase.core.mapping.id.GeneratedValue;
 import org.springframework.data.couchbase.core.mapping.id.GenerationStrategy;
 
 import java.util.List;
-
 // To remember data format
 
 @Builder

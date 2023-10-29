@@ -7,7 +7,6 @@ import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.query.QueryOptions;
 import com.couchbase.client.java.query.QueryResult;
 import com.ticket.Ticketing.config.SeatConfig;
-import com.ticket.Ticketing.config.UserConfig;
 import com.ticket.Ticketing.domain.document.SeatDocument;
 import com.ticket.Ticketing.domain.repository.SeatRepository;
 import com.ticket.Ticketing.dto.SeatDto;
@@ -123,7 +122,4 @@ public class SeatService {
                 .build();
 
     }
-
-
-
 }

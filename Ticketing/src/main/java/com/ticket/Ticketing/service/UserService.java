@@ -5,7 +5,6 @@ import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Collection;
 import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.kv.GetResult;
-import com.ticket.Ticketing.config.SeatConfig;
 import com.ticket.Ticketing.config.UserConfig;
 import com.ticket.Ticketing.domain.document.UserDocument;
 import com.ticket.Ticketing.domain.repository.UserRepository;
@@ -18,11 +17,11 @@ import java.util.List;
 
 import static com.ticket.Ticketing.Ticketing.cluster;
 
-
 @Service
 @AllArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+
     // CREATE
     private UserDocument createUserDocument(UserDto userDto){
         return UserDocument.builder()

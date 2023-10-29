@@ -11,5 +11,4 @@ import lombok.*;
 public class SeatDto {
     private String id;
     private Boolean sold;
-
 }

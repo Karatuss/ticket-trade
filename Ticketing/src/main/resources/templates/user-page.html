@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>좌석선택</title>
+    <link rel="stylesheet" href="../static/css/seat-styles.css">
+</head>
+<body>
+    <h1>좌석을 선택하세요</h1>
+    <div id="seat-container"></div> <!--좌석 표시 부분-->
+
+    <button id="bookSeats">선택한 좌석 예약</button>
+    <button id="logout">로그아웃</button>
+
+    <hr>
+
+    <div id="display">
+        <h2>예약한 좌석 목록</h2>
+        <ul></ul>
+    </div>
+
+    <script>
+        const seats = [];
+        const rows = 4;
+        const seatsPerRow = 5;
+        var selectedSeats = [];
+        var MySeat = [];
+
+        for (let i = 1; i <= rows; i++) {
+            for (let j = 1; j <= seatsPerRow; j++) {
+                seats.push({ id: (i - 1) * seatsPerRow + j, booked: false });
+            }
+        }
+
+        for (let i = 0; i < seats.length; i++) { 
+            var seat = document.createElement('div');
+        }
+
+        function show_seat(){
+            var displayElement = document.getElementById("display").querySelector("ul");
+        displayElement.innerHTML = ""; // 기존 목록 초기화
+
+            for (var i = 0; i < MySeat.length; i++) {
+                var listItem = document.createElement('li');
+                listItem.textContent = '좌석 ' + MySeat[i];
+                displayElement.appendChild(listItem);
+            }
+            
+        }
+
+    </script>
+    <script src="../static/js/buy-setcolor.js"></script>
+    <script src="../static/js/buy-book.js"></script>
+    <script src="../static/js/user-logout.js"></script>
+</body>
+</html>

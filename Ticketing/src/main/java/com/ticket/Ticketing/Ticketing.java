@@ -1,16 +1,10 @@
 package com.ticket.Ticketing;
 
-
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.ClusterOptions;
-import com.ticket.Ticketing.domain.document.SeatDocument;
 import com.ticket.Ticketing.service.SeatService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-
-import java.util.List;
 
 
 // MAIN
@@ -29,6 +23,7 @@ public class Ticketing {
 				connStr,
 				ClusterOptions.clusterOptions("adminuser", "adminuser")
 		);
+    
 		// create seat
 		seatService = new SeatService();
 		seatService.createSeatDocuments();
