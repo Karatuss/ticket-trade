@@ -112,7 +112,7 @@ Please follow the official hyperledger-fabric document.
 
 - Hyperledger fabric 2.5.0
 - Docker Desktop 4.23.0
-- Spring boot **Version 써주기**
+- Spring boot 3.1.4
 - **여타 다른거 추가하기**
 
 #### CouchBase Setting
