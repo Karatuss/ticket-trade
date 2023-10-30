@@ -50,7 +50,7 @@
     ·
     <a href="https://github.com/TwoPair/ticket-trade/issues">Request Feature</a>
   </p>
-</p>
+
 
 
 

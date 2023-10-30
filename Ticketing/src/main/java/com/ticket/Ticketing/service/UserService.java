@@ -5,6 +5,7 @@ import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Collection;
 import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.kv.GetResult;
+import com.ticket.Ticketing.config.UserConfig;
 import com.ticket.Ticketing.domain.document.UserDocument;
 import com.ticket.Ticketing.domain.repository.UserRepository;
 import com.ticket.Ticketing.dto.UserDto;
@@ -48,13 +49,14 @@ public class UserService {
     }
 
     public List<String> getBookedSeat(String userId){
-        Bucket userBucket = cluster.bucket("user_bucket");
+        Bucket userBucket = cluster.bucket(UserConfig.getStaticBucketName());
         Collection userCollection = userBucket.defaultCollection();
 
         GetResult userResult = userCollection.get(userId);
         JsonObject content = userResult.contentAsObject();
 
-        List<String> userSeatList = (List<String>) content.get("seat"); //! 나중에 받은 데이터 seat인지도 확인해야함
+        List<String> userSeatList = (List<String>) content.get("seat");
+        //TODO 나중에 받은 데이터 seat인지도 확인해야함
 
         return userSeatList;
     }
@@ -82,6 +84,7 @@ public class UserService {
                 .gender(userDocument.getGender())
                 .seat(userDocument.getSeat())
                 .role(userDocument.getRole())
+                .loginAttempts(userDocument.getLoginAttempts())
 //                .faceImg(userDocument.getFaceImg())
                 .build();
 

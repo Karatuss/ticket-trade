@@ -46,6 +46,8 @@ public class UserDocument {
     @Field
     Role role;
 
+    @Field
+    Integer loginAttempts;
 
 
     // Face Image is replaced Id.jpg and Image File is assumed to be stored in another server

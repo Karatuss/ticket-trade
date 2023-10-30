@@ -9,7 +9,6 @@ import org.springframework.data.couchbase.repository.config.EnableCouchbaseRepos
 @EnableCouchbaseRepositories(basePackages = {"com.ticket.Ticketing"})
 public class SeatConfig extends AbstractCouchbaseConfiguration {
 
-
     private static final String NODE_LIST = "couchbase://127.0.0.1";
     private static final String BUCKET_NAME = "seat_bucket";
     private static final String USERNAME = "adminuser";
@@ -24,9 +23,8 @@ public class SeatConfig extends AbstractCouchbaseConfiguration {
     public String getBucketName(){
         return BUCKET_NAME;
     }
-    public static String getStaticBucketName(){
-        return BUCKET_NAME;
-    }
+
+    public static String getStaticBucketName(){ return BUCKET_NAME; }
 
     @Override
     public String getUserName(){

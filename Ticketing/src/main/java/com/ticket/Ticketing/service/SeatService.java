@@ -25,19 +25,19 @@ import static com.ticket.Ticketing.Ticketing.cluster;
 public class SeatService {
     private SeatRepository seatRepository;
 
-    //! 추후에 manager가 관리하게 변경
+    //TODO 추후에 manager가 관리하게 변경
     private final static int totalSeats = 20;
 
     // CREATE
     public void createSeatDocuments() {
-        Bucket seatBucket = cluster.bucket("seat_bucket");
+        Bucket seatBucket = cluster.bucket(SeatConfig.getStaticBucketName());
         Collection seatCollection = seatBucket.defaultCollection();
 
         for (int i = 1; i <= totalSeats; i++) {
             String documentId = String.format("%03d", i);
             if(!documentExists(seatCollection, documentId)) {   // don't make initial documents if already exist
                 JsonObject jsonData = JsonObject.create()
-                        .put("id", String.valueOf(i))
+                        .put("id", String.valueOf(i))   //TODO id를 eventName001로 변경 예정
                         .put("sold", false);
                 seatCollection.insert(documentId, jsonData);
             }
@@ -93,7 +93,7 @@ public class SeatService {
     }
 
     public void deleteAllSeatDocuments(){
-        Bucket seatBucket = cluster.bucket("seat_bucket");
+        Bucket seatBucket = cluster.bucket(SeatConfig.getStaticBucketName());
         Collection seatCollection = seatBucket.defaultCollection();
 
         for (int i = 1; i <= totalSeats; i++) {
@@ -104,7 +104,7 @@ public class SeatService {
         }
     }
     public void deleteSeatDocuments(Integer id){
-        Bucket seatBucket = cluster.bucket("seat_bucket");
+        Bucket seatBucket = cluster.bucket(SeatConfig.getStaticBucketName());
         Collection seatCollection = seatBucket.defaultCollection();
         String documentId = String.format("%03d", id);
 

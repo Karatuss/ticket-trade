@@ -27,6 +27,9 @@ public class UserConfig extends AbstractCouchbaseConfiguration {
     public String getBucketName(){
         return BUCKET_NAME;
     }
+    public static String getStaticBucketName(){
+        return BUCKET_NAME;
+    }
 
     @Override
     public String getUserName(){

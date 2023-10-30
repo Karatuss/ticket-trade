@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function(){ //html이 로드되고 파싱된 후 실행
     var seatContainer = document.getElementById('seat-container');
 
+
     fetch('http://localhost:8080/seat')
     .then(response => {
         if(!response.ok){
@@ -8,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function(){ //html이 로드되고
         }
         return response.json();
     })
-  
+
     .then(data => { // 내가 이미 예약한 좌석과 다른 사람이 예약한 좌석의 정보를 받아옴
         MySeat.push(data.UserSeat);
         for(let i = 0; i < MySeat.length; i++)
@@ -47,6 +48,7 @@ document.addEventListener('DOMContentLoaded', function(){ //html이 로드되고
             if (this.classList.contains('reserved')) {
                 return;
             }
+
             else {
                 this.classList.toggle('selected'); //클릭했을 시 해당 div을 selected라는 항목의 css가 적용되도록 설정
             }

@@ -53,9 +53,10 @@ public class UserController {
                         String.valueOf(String.valueOf(registerData.get("username"))),
                         Integer.valueOf(String.valueOf(registerData.get("age"))),
                         String.valueOf(registerData.get("email")),
-                        gender,
-                        String.valueOf( registerData.get("phoneNumber")),
-                        Role.ROLE_MEMBER
+                        gender, String.valueOf( registerData.get("phoneNumber")),
+                        null,
+                        Role.MEMBER,
+                        0
                 );
 
                 userService.setList(userDto);
