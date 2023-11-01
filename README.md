@@ -138,9 +138,9 @@ docker run -d --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase:communit
    ```sh
    git clone https://github.com/TwoPair/ticket-trade.git
    ```
-2. Run the launcher **아직 안 만들었다. 전체 프로그램 동작시킬 런처 만들기!**
+2. Run the launcher **만드는 중. 최종적으로 바이너리 실행파일 형식으로 할 예정!**
    ```sh
-   ./launcher
+   ./launcher.sh
    ```
 
 
