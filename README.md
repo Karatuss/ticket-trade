@@ -113,7 +113,7 @@ Please follow the official hyperledger-fabric document.
 - Hyperledger fabric 2.5.0
 - Docker Desktop 4.23.0
 - Spring boot 3.1.4
-- Java 19
+- Java 17
 - **여타 다른거 추가하기**
 
 #### CouchBase Setting
@@ -127,8 +127,8 @@ docker run -d --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase:communit
   - Run > Edit Configurations > Modify Options > ☑️ Add VM options 
   - INPUT
     ```
-    -Dcom.sun.management.jmxremote.port=9000 \
-    -Dcom.sun.management.jmxremote.authenticate=false \
+    -Dcom.sun.management.jmxremote.port=9000 
+    -Dcom.sun.management.jmxremote.authenticate=false 
     -Dcom.sun.management.jmxremote.ssl=false
     ```
 
