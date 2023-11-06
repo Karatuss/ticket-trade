@@ -1,19 +1,96 @@
+#title {
+  background-color: #f8f8f8;
+  padding: 20px;
+  text-align: center;
+}
+
+h1 {
+  font-size: 36px;
+}
+
+#select{
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin: 40px auto;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 30px;
+  padding: 40px 20px 20px 20px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  width: 400px;
+  height: auto;
+}
+
 .seating-row {
-    display: flex;
-    margin-bottom: 10px;
-  }
-  .seat {
-    width: 40px;
-    height: 40px;
-    margin-right: 5px;
-    background-color: #ccc;
-    cursor: pointer;
-  }
-  .selected {
-    background-color: #ff5722;
-    pointer-events: none;
-  }
-  .reserved {
-    background-color: #999;
-    pointer-events: none;
-  }
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.seat {
+  width: 60px;
+  height: 60px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  margin: 0 5px;
+  background-color: #f2f2f2;
+  cursor: pointer;
+}
+
+
+.selected {
+  background-color: #ff5722;
+}
+
+.reserved {
+  background-color: #999;
+  pointer-events: none;
+}
+
+
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin: 50px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+  margin: 10px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+#reservedSeatsText {
+  font-size: 20px;
+  margin-top: 30px;
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+  background-color: #f2f2f2;
+  padding: 10px;
+  border-radius: 8px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  margin: 5px 0;
+  font-size: 18px;
+  color: #333;
+  padding: 10px;
+}
