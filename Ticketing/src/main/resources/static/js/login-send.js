@@ -72,4 +72,4 @@ document.addEventListener('DOMContentLoaded', function() {
     inputElement.focus(); // 자동으로 포커스 주기
 });
 
-document.getElementById("login").addEventListener("click", login());
+document.getElementById("login").addEventListener("click", login);

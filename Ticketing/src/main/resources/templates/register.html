@@ -1,34 +1,38 @@
 <!DOCTYPE html>
+<html lang="en">
 
-<html>
-    <head>
-        <meta charset="utf-8">
-        <title>회원가입</title>
-    </head>
-    <body>
-        <div>
-            <h2 class = "title">회원가입</h2>
-        </div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입</title>
+    <link rel="stylesheet" href="/css/register-style.css">
+</head>
+
+<body>
+    <div>
+        <h2 class = "title">회원가입</h2>
+    </div>
+    <br>
+    <!--회원가입창-->
+    <div class = "input-box">
+        생성할 아이디 <input type = "text" id = "n_ID"><br>
+        생성할 비밀번호 <input type = "password" id = "n_PW"><br>
+        이름 <input type = "text" id = "username"><br>
+        나이 <input type = "number" id = "age" min = "0" max = "100"><br>
+        이메일 <input type = "email" id = "email"><br>
+        성별<br>
+        <input type="radio" name="gender" value="MALE" checked> 남성
+        <input type="radio" name="gender" value="FEMALE"> 여성<br>
+        휴대폰번호 <input type="text" oninput = "autoHyphen(this)" id="phoneNumber" class="phoneNumberInput" maxlength="13" required><br>
         <br>
-        <!--회원가입창-->
-        <div>
-            생성할 아이디 <input type = "text" id = "n_ID"><br>
-            생성할 비밀번호 <input type = "password" id = "n_PW"><br>
-            이름 <input type = "text" id = "username"><br>
-            나이 <input type = "number" id = "age"><br>
-            이메일 <input type = "email" id = "email"><br>
-            성별<br>
-            <input type="radio" name="gender" value="MALE"> 남성
-            <input type="radio" name="gender" value="FEMALE"> 여성<br>
-            휴대폰 번호 <input type = "text" id = "phoneNumber"><br>
-            <span id="example" style="color: #666;">ex)01012345678 or 010-1234-5678</span>
-            <br>
+        <div class = "button-container">
             <button id = "submit">생성하기</button>
+            <button id = "return" onclick="location.href='login'">되돌아가기</button>
         </div>
+    </div>
 
-        <script src = "/js/register-send.js"></script>
-
-    </body>
+    <script src = "/js/register-send.js"></script>
 
 
+</body>
 </html>

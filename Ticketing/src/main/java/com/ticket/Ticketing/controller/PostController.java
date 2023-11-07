@@ -33,7 +33,7 @@ import static com.ticket.Ticketing.Ticketing.cluster;
 @AllArgsConstructor
 @SessionAttributes("user")
 public class PostController {
-    public static String loginUserID;
+
     @Autowired
     PasswordEncoder passwordEncoder;
     private static final int MAX_ATTEMPTS = 3;
@@ -102,14 +102,18 @@ public class PostController {
     @PostMapping(value = "/login")
     public ResponseEntity<Object> login(@RequestBody HashMap<String, Object> loginData, HttpServletRequest request) {
         try {
-
             Bucket userBucket = cluster.bucket(UserConfig.getStaticBucketName());
             Collection userCollection = userBucket.defaultCollection();
 
             // input id, pw
             Object userID = loginData.get("user_ID");
             Object userPW = loginData.get("user_PW");
-            loginUserID = (String) userID;
+            String loginUserID = (String) userID;
+
+            // if not fully inputted id or pw, throw error
+            if(((String) userID).isEmpty() || ((String) userPW).isEmpty()){
+                throw new LoginException();
+            }
 
             // Couchbase pw for login
             Object checkedPW;
@@ -151,7 +155,15 @@ public class PostController {
             
             // get login session
             HttpSession session = request.getSession(); // if no session exists, make a new session
-            session.setAttribute(SessionConst.LOGIN_MEMBER, loginUserID);
+
+            // give information user is member or manager to session
+            //TODO give info about role to session
+            if(content.get("role").equals("MEMBER")) {
+                session.setAttribute(SessionConst.LOGIN_MEMBER, loginUserID);
+            }else{
+                session.setAttribute(SessionConst.LOGIN_MANAGER, loginUserID);
+
+            }
 
             loginData.put("loginSuccess", true);
             loginData.put("identify", content.get("role"));
@@ -175,7 +187,7 @@ public class PostController {
 
     }
 
-
+    // Seat
     @PostMapping(value="/seat")
     public ResponseEntity<Object> seat(@RequestBody HashMap<String, Object> seatData,
                                        @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false)String loginUser,
@@ -199,48 +211,54 @@ public class PostController {
             }
             // check login user exists
             if(loginUser == null){ // login exception
-                session.invalidate();
                 throw new LoginException();
             }
 
-            if(seatData.get("seat") == null){ // logout
-                loginUserID = null; // reset because of logout
+            if(seatData.containsKey("logout")){ // logout
+                session.invalidate(); // delete session
 
             } else{  // seat
-                Object dataSeat = seatData.get("seat");
-                List<String> seatList = (List<String>) dataSeat;
+                Object dataSeat = seatData.get("selectedSeatIds");
+                List<Integer> seatList = (List<Integer>) dataSeat;
+
+                // user check wrong the number of seats
+                if(seatList.isEmpty() || seatList.size()>2){
+                    seatData.put("success",false);
+                    throw new IllegalArgumentException();
+                }
 
                 // update seat info from user data
-                JsonObject revisedInfo = userCollection.get(loginUserID).contentAsObject();
+                JsonObject revisedInfo = userCollection.get(loginUser).contentAsObject();
                 revisedInfo.put("seat", seatList);
 
-                userCollection.replace(loginUserID, revisedInfo);
+                userCollection.replace(loginUser, revisedInfo);
 
                 // update seat info from seat data
-                for(String seatNum : seatList) {
-                    String documentId = String.format("%03d", Integer.valueOf(seatNum));
+                for(Integer seatNum : seatList) {
+                    String documentId = String.format("%03d", seatNum);
 
                     // check if seat already sold out
                     Object seatResult = seatCollection.get(documentId).contentAsObject().get("sold");
                     if(seatResult.equals(false)) {
                         JsonObject jsonData = JsonObject.create()
-                                .put("id", documentId)
+                                .put("id", String.format("%d", Integer.valueOf(documentId)))
                                 .put("sold", true);
                         seatCollection.replace(documentId, jsonData);
                     }
                 }
-
+                seatData.put("success",true);
             }
 
-            // don't need anything to seatData because front-end didn't request
-//            seatData.put();
 
             // return seatData
             return ResponseEntity.status(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(seatData);
-
-        }  catch(IllegalStateException | LoginException e){ // session or login error
+        } catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(seatData);
+        } catch(IllegalStateException | LoginException e){ // session or login error
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(seatData);
@@ -249,6 +267,46 @@ public class PostController {
                     .body(seatData);
         }
 
+    }
+
+    // Admin
+    @PostMapping(value = "/manager")
+    public ResponseEntity<Object> manager(@RequestBody HashMap<String, Object> managerData,
+                                        @SessionAttribute(name = SessionConst.LOGIN_MANAGER, required = false)String loginManager,
+                                        HttpServletRequest request){
+
+        try{
+            // get session
+            HttpSession session = request.getSession(false);
+
+            // check session is maintained
+            if(session == null){
+                throw new IllegalStateException();
+            }
+            // check login manager exists
+            if(! loginManager.equals(SessionConst.LOGIN_MANAGER)){ // login exception
+                throw new LoginException();
+            }
+
+            if(managerData.get("logout").equals("logout")){ // logout
+                session.invalidate(); // delete session
+            }
+
+
+        // return managerData
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(managerData);
+
+    }  catch(IllegalStateException | LoginException e){ // session or login error
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(managerData);
+    } catch (Exception e){ // network server connect error
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(managerData);
+    }
     }
 
 
