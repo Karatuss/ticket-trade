@@ -41,15 +41,29 @@ public class GetController {
 //    private final SeatService seatService;
 
 
+    @GetMapping("/")
+    public String none() {
+        return "redirect:/index";
+    }
+
     @GetMapping("/index")
     public String index() {
+        return "index";
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request) {
+
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
         return "index";
     }
 
 
     @GetMapping("/login")
     public String login(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) String loginUser) {
-
 
         if (loginUser != null) {
             return "index";
