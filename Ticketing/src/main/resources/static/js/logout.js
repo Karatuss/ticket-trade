@@ -9,5 +9,3 @@ document.getElementById("logout").addEventListener("click", function () {
     location.reload();
 
 });
-
-
