@@ -4,31 +4,21 @@ import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Collection;
 import com.couchbase.client.java.json.JsonObject;
-import com.couchbase.client.java.query.QueryOptions;
-import com.couchbase.client.java.query.QueryResult;
 import com.ticket.Ticketing.config.SeatConfig;
-import com.ticket.Ticketing.domain.document.SeatDocument;
-import com.ticket.Ticketing.domain.repository.SeatRepository;
-import com.ticket.Ticketing.dto.SeatDto;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import static com.ticket.Ticketing.Ticketing.cluster;
 
 @Service
 @AllArgsConstructor
-@NoArgsConstructor
 public class SeatService {
-    private SeatRepository seatRepository;
 
     //TODO 추후에 manager가 관리하게 변경
     private final static int totalSeats = 20;
 
-    // CREATE
     public void createSeatDocuments() {
         Bucket seatBucket = cluster.bucket(SeatConfig.getStaticBucketName());
         Collection seatCollection = seatBucket.defaultCollection();
@@ -51,6 +41,19 @@ public class SeatService {
             return false; // Document not exists
         }
     }
+    public void deleteAllSeatDocuments(){
+        Bucket seatBucket = cluster.bucket(SeatConfig.getStaticBucketName());
+        Collection seatCollection = seatBucket.defaultCollection();
+
+        for (int i = 1; i <= totalSeats; i++) {
+            String documentId = String.format("%03d", i);
+            if(documentExists(seatCollection, documentId)) {
+                seatCollection.remove(documentId);
+            }
+        }
+    }
+
+    /*
     // READ
     public List<SeatDto> getSeatList(){
         // return dto list made by dto got from couchbase
@@ -82,6 +85,7 @@ public class SeatService {
                 .sold(seatDto.getSold())
                 .build();
     }
+
     public void setSeatList(SeatDto seatDto){
 
         seatRepository.save(this.updateSeatDocument(seatDto));
@@ -92,17 +96,6 @@ public class SeatService {
         seatRepository.delete(this.updateSeatDocument(seatDto));
     }
 
-    public void deleteAllSeatDocuments(){
-        Bucket seatBucket = cluster.bucket(SeatConfig.getStaticBucketName());
-        Collection seatCollection = seatBucket.defaultCollection();
-
-        for (int i = 1; i <= totalSeats; i++) {
-            String documentId = String.format("%03d", i);
-            if(documentExists(seatCollection, documentId)) {
-                seatCollection.remove(documentId);
-            }
-        }
-    }
     public void deleteSeatDocuments(Integer id){
         Bucket seatBucket = cluster.bucket(SeatConfig.getStaticBucketName());
         Collection seatCollection = seatBucket.defaultCollection();
@@ -122,4 +115,5 @@ public class SeatService {
                 .build();
 
     }
+    */
 }

@@ -1,28 +1,30 @@
 <!DOCTYPE html>
-
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <title>로그인</title>
-    </head>
-    <body>
-        <div>
-            <h2 class = "title">로그인</h2>
-        </div>
-        <br>
-        <!--로그인창-->
-        <div>
-            ID <input type = "text" id = "user_ID"><br>
-            PW <input type = "password" id = "user_PW"><br>
-            <button id = "login">로그인</button>
-            <button onclick="location.href='register'">회원가입</button>
-        </div>
 
-        <br>
-        <!--임시 버튼들-->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인</title>
+    <link rel="stylesheet" href="/css/login-style.css">
+</head>
 
+<body>
+    <div id = title>
+        <h1>로그인</h1>
+    </div>
 
-        <script src = "/js/login-send.js"></script>
+    <br>
 
-    </body>
+    <div id = main>
+        ID <input type = "text" id = "user_ID"><br>
+        PS <input type = "password" id = "user_PW"><br>
+        <button id = "login">로그인</button>
+        <button onclick="location.href='register'">회원가입</button>
+    </div>
+
+    <br>
+
+    <script src = "/js/login-send.js"></script>
+
+</body>
 </html>

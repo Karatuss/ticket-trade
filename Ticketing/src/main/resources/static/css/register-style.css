@@ -1,0 +1,58 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 50px;
+}
+
+.title {
+    font-size: 50px;
+}
+
+.input-box {
+    text-align: left;
+    display: inline-block;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 4px;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="number"],
+input[type="email"],
+input[type="radio"] {
+    padding: 10px;
+    margin: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.button-container {
+    text-align: center;
+}
+
+.button-container button {
+    margin: 10px;
+}
+
+.phoneNumberInput {
+    width: 150px;
+    text-align: center;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: #fff;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 5px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
