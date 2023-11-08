@@ -1,0 +1,17 @@
+# Vim file artifacts
+.*.sw*
+.DS_Store
+.project
+# omit Go vendor directories
+vendor/
+.vscode
+.gradle
+.idea
+# Dependency directories
+node_modules/
+# Ignore Gradle build output directory
+build
+package-lock.json
+
+# Test files - @TwoPair
+ticket-network/scripts/test.sh

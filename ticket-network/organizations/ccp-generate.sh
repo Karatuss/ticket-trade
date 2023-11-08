@@ -26,6 +26,8 @@ function yaml_ccp {
         organizations/ccp-template.yaml | sed -e $'s/\\\\n/\\\n          /g'
 }
 
+echo "Im here"
+
 ORG=seller
 P0PORT=7051
 CAPORT=7054

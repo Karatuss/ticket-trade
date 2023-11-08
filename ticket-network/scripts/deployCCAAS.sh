@@ -8,7 +8,7 @@
 
 source scripts/utils.sh
 
-CHANNEL_NAME=${1:-"mychannel"}
+CHANNEL_NAME=${1:-"ticket-channel"}
 CC_NAME=${2}
 CC_SRC_PATH=${3}
 CCAAS_DOCKER_RUN=${4:-"true"}
@@ -20,6 +20,7 @@ CC_COLL_CONFIG=${9:-"NA"}
 DELAY=${10:-"3"}
 MAX_RETRY=${11:-"5"}
 VERBOSE=${12:-"false"}
+CC_CHANNEL_CONFIG=${13:-"NA"}
 
 CCAAS_SERVER_PORT=9999
 
@@ -35,7 +36,8 @@ println "- CC_VERSION: ${C_GREEN}${CC_VERSION}${C_RESET}"
 println "- CC_SEQUENCE: ${C_GREEN}${CC_SEQUENCE}${C_RESET}"
 println "- CC_END_POLICY: ${C_GREEN}${CC_END_POLICY}${C_RESET}"
 println "- CC_COLL_CONFIG: ${C_GREEN}${CC_COLL_CONFIG}${C_RESET}"
-println "- CC_INIT_FCN: ${C_GREEN}${CC_INIT_FCN}${C_RESET}"
+println "- CC_CHANNEL_CONFIG: ${C_GREEN}${CC_COLL_CONFIG}${C_RESET}"
+println "- CC_INIT_FCN: ${C_GREEN}${CC_CHANNEL_CONFIG}${C_RESET}"
 println "- CCAAS_DOCKER_RUN: ${C_GREEN}${CCAAS_DOCKER_RUN}${C_RESET}"
 println "- DELAY: ${C_GREEN}${DELAY}${C_RESET}"
 println "- MAX_RETRY: ${C_GREEN}${MAX_RETRY}${C_RESET}"
@@ -68,6 +70,12 @@ if [ "$CC_COLL_CONFIG" = "NA" ]; then
   CC_COLL_CONFIG=""
 else
   CC_COLL_CONFIG="--collections-config $CC_COLL_CONFIG"
+fi
+
+if [ "$CC_CHANNEL_CONFIG" = "NA" ]; then
+  CC_CHANNEL_CONFIG=""
+else
+  CC_CHANNEL_CONFIG="--channel-config-policy $CC_CHANNEL_CONFIG"
 fi
 
 # import utils
@@ -105,7 +113,7 @@ METADATA-EOF
 
     PACKAGE_ID=$(peer lifecycle chaincode calculatepackageid ${CC_NAME}.tar.gz)
   
-    successln "Chaincode is packaged  ${address}"
+    successln "Chaincode is packaged ${address}"
 }
 
 buildDockerImages() {
@@ -132,14 +140,14 @@ startDockerContainer() {
   if [ "$CCAAS_DOCKER_RUN" = "true" ]; then
     infoln "Starting the Chaincode-as-a-Service docker container..."
     set -x
-    ${CONTAINER_CLI} run --rm -d --name peer0org1_${CC_NAME}_ccaas  \
-                  --network fabric_test \
+    ${CONTAINER_CLI} run --rm -d --name peer0seller_${CC_NAME}_ccaas  \
+                  --network fabric_ticket \
                   -e CHAINCODE_SERVER_ADDRESS=0.0.0.0:${CCAAS_SERVER_PORT} \
                   -e CHAINCODE_ID=$PACKAGE_ID -e CORE_CHAINCODE_ID_NAME=$PACKAGE_ID \
                     ${CC_NAME}_ccaas_image:latest
 
-    ${CONTAINER_CLI} run  --rm -d --name peer0org2_${CC_NAME}_ccaas \
-                  --network fabric_test \
+    ${CONTAINER_CLI} run  --rm -d --name peer0buyer_${CC_NAME}_ccaas \
+                  --network fabric_ticket \
                   -e CHAINCODE_SERVER_ADDRESS=0.0.0.0:${CCAAS_SERVER_PORT} \
                   -e CHAINCODE_ID=$PACKAGE_ID -e CORE_CHAINCODE_ID_NAME=$PACKAGE_ID \
                     ${CC_NAME}_ccaas_image:latest
@@ -151,13 +159,13 @@ startDockerContainer() {
   else
   
     infoln "Not starting docker containers; these are the commands we would have run"
-    infoln "    ${CONTAINER_CLI} run --rm -d --name peer0org1_${CC_NAME}_ccaas  \
-                  --network fabric_test \
+    infoln "    ${CONTAINER_CLI} run --rm -d --name peer0seller_${CC_NAME}_ccaas  \
+                  --network fabric_ticket \
                   -e CHAINCODE_SERVER_ADDRESS=0.0.0.0:${CCAAS_SERVER_PORT} \
                   -e CHAINCODE_ID=$PACKAGE_ID -e CORE_CHAINCODE_ID_NAME=$PACKAGE_ID \
                     ${CC_NAME}_ccaas_image:latest"
-    infoln "    ${CONTAINER_CLI} run --rm -d --name peer0org2_${CC_NAME}_ccaas  \
-                  --network fabric_test \
+    infoln "    ${CONTAINER_CLI} run --rm -d --name peer0buyer_${CC_NAME}_ccaas  \
+                  --network fabric_ticket \
                   -e CHAINCODE_SERVER_ADDRESS=0.0.0.0:${CCAAS_SERVER_PORT} \
                   -e CHAINCODE_ID=$PACKAGE_ID -e CORE_CHAINCODE_ID_NAME=$PACKAGE_ID \
                     ${CC_NAME}_ccaas_image:latest"
@@ -171,30 +179,31 @@ buildDockerImages
 ## package the chaincode
 packageChaincode
 
-## Install chaincode on peer0.org1 and peer0.org2
-infoln "Installing chaincode on peer0.org1..."
+## Install chaincode on peer0.seller and peer0.buyer
+infoln "Install chaincode on peer0.seller..."
 installChaincode 1
-infoln "Install chaincode on peer0.org2..."
+infoln "Install chaincode on peer0.buyer..."
 installChaincode 2
 
 ## query whether the chaincode is installed
 queryInstalled 1
+# queryInstalled 2
 
-## approve the definition for org1
+## approve the definition for seller
 approveForMyOrg 1
 
 ## check whether the chaincode definition is ready to be committed
-## expect org1 to have approved and org2 not to
-checkCommitReadiness 1 "\"Org1MSP\": true" "\"Org2MSP\": false"
-checkCommitReadiness 2 "\"Org1MSP\": true" "\"Org2MSP\": false"
+## expect seller to have approved and buyer not to
+checkCommitReadiness 1 "\"SellerMSP\": true" "\"BuyerMSP\": false"
+checkCommitReadiness 2 "\"SellerMSP\": true" "\"BuyerMSP\": false"
 
-## now approve also for org2
+## now approve also for buyer
 approveForMyOrg 2
 
 ## check whether the chaincode definition is ready to be committed
 ## expect them both to have approved
-checkCommitReadiness 1 "\"Org1MSP\": true" "\"Org2MSP\": true"
-checkCommitReadiness 2 "\"Org1MSP\": true" "\"Org2MSP\": true"
+checkCommitReadiness 1 "\"SellerMSP\": true" "\"BuyerMSP\": true"
+checkCommitReadiness 2 "\"SellerMSP\": true" "\"BuyerMSP\": true"
 
 ## now that we know for sure both orgs have approved, commit the definition
 commitChaincodeDefinition 1 2
@@ -204,7 +213,7 @@ queryCommitted 1
 queryCommitted 2
 
 # start the container
-startDockerContainer
+# startDockerContainer  # Maybe never use
 
 ## Invoke the chaincode - this does require that the chaincode have the 'initLedger'
 ## method defined
