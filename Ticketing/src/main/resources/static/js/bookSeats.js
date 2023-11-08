@@ -23,33 +23,22 @@ function createSeatElement(seat) {
 // 좌석을 선택하거나 해제하는 함수
 function toggleSeat(seat) {
     {
-        if (seat.reservedBy === 'other' || seat.reservedBy === 'self') return; // 다른 사람이 예약한 좌석이거나 이미 예약된 좌석은 선택 불가능
-
         const seatElement = document.querySelector(`[data-seat-id="${seat.id}"]`);
 
+        if (seatElement.classList.contains('reserved')) return; // 다른 사람이 예약한 좌석이거나 이미 예약된 좌석은 선택 불가능
+        /*
+        if (seat.reservedBy === 'other' || seat.reservedBy === 'self') return;
+        */
         if (seatElement.classList.contains('selected')) {
             seatElement.classList.remove('selected');
             selectedSeats = selectedSeats.filter(selectedSeat => selectedSeat.id !== seat.id);
+        } else if (selectedSeats.filter(Boolean).length >= 2) {
+            alert('이미 2개 이상의 좌석을 선택하셨습니다.');
         } else {
-            if (selectedSeats.length < 2) {
-                seatElement.classList.toggle('selected');
-                selectedSeats.push(seat);
-            } else return;
+            seatElement.classList.toggle('selected');
+            selectedSeats.push(seat);
         }
     }
-}
-
-
-// 좌석을 화면에 렌더링
-const seatingPlanElement = document.getElementById('seatingPlan');
-for (let i = 0; i < seats.length; i += seatsPerRow) {
-    const seatingRow = document.createElement('div');
-    seatingRow.classList.add('seating-row');
-    seats.slice(i, i + seatsPerRow).forEach(seat => {
-        const seatElement = createSeatElement(seat);
-        seatingRow.appendChild(seatElement);
-    });
-    seatingPlanElement.appendChild(seatingRow);
 }
 
 // 예약하기 버튼을 눌렀을 때 선택한 좌석 번호를 서버로 전송
@@ -66,20 +55,19 @@ function bookSelectedSeats() {
             body: JSON.stringify({selectedSeatIds})
         })
             .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // 성공적으로 예약되었을 때 처리
-                    selectedSeats.forEach(seat => {
-                        seat.reservedBy = 'self'; // 예약자를 'self'로 설정
-                        const seatElement = document.querySelector(`[data-seat-id="${seat.id}"]`);
-                        seatElement.classList.remove('selected');
-                        seatElement.classList.add('reserved');
-                    });
+            .then(() => {
+                // if (data.success) {
+                // 성공적으로 예약되었을 때 처리
+                selectedSeats.forEach(seat => {
+                    seat.reservedBy = 'self'; // 예약자를 'self'로 설정
+                    const seatElement = document.querySelector(`[data-seat-id="${seat.id}"]`);
+                    seatElement.classList.remove('selected');
+                    seatElement.classList.add('reserved');
+                });
 
-                    selectedSeats = [];
-                } else {
-                    alert('다시 시도해 주세요.');
-                }
+                // } else {
+                //     alert('다시 시도해 주세요.');
+                // }
 
                 updateReservedSeatsText();
             })
@@ -105,40 +93,42 @@ function updateReservedSeatsText() {
     });
 }
 
-// 예매된 좌석 정보를 서버로부터 받아와서 업데이트
-function fetchBookedSeats() {
-    fetch('http://localhost:8080/seat', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const bookedSeatIds = data.bookedSeatIds;
+document.addEventListener('DOMContentLoaded', function () {
+    const User_reserved_seats = document.querySelector('a[Login-User-Seat]');//Login-User-Seat 로 받아 온 영역 선택
+    const All_reserved_seats = document.querySelector('a[Seat-Reserved]');//Seat-Reserved 로 받아 온 영역 선택
 
-                seats.forEach(seat => {
-                    if (bookedSeatIds.includes(seat.id)) {
-                        seat.reservedBy = 'other'; // 다른 예약자로 설정
-                        const seatElement = document.querySelector(`[data-seat-id="${seat.id}"]`);
-                        seatElement.classList.add('reserved');
-                    }
-                });
+    const LoginUserSeatString = User_reserved_seats.getAttribute('Login-User-Seat');//받아온 영역으로 부터 Login-User-Seat 의 이름으로 저장 된 정보를 부여
+    const AllUserSeatString = All_reserved_seats.getAttribute('Seat-Reserved');//받아온 영역으로 부터 Seat-Reserved 의 이름으로 저장 된 정보를 부여
 
-                updateReservedSeatsText();
-            } else {
-                console.error('Error fetching booked seats:', data.error);
+    const LoginUserSeatArray_Before = JSON.parse(LoginUserSeatString); //현재 string으로 된 정보(배열 상태)를 사용하기 위해 JSON 형식으로 파싱
+    const AllUserSeatArray = JSON.parse(AllUserSeatString); //현재 string으로 된 정보(배열 상태)를 사용하기 위해 JSON 형식으로 파싱
+
+    const CleanedLoginUserSeatArray = LoginUserSeatArray_Before.filter(element => element !== null); //loginUserSeatArray_Before 중 null값이 들어 있을 수 있기 때문에 이를 제거 [1, null] or [null, 1] -> [1]
+
+    // 좌석을 화면에 렌더링
+    const seatingPlanElement = document.getElementById('seatingPlan');
+    for (let i = 0; i < seats.length; i += seatsPerRow) {
+        const seatingRow = document.createElement('div');
+        seatingRow.classList.add('seating-row');
+        seats.slice(i, i + seatsPerRow).forEach(seat => {
+            const seatElement = createSeatElement(seat); // seatElement는 seat 좌석의 div을 가리킨다.
+            seatingRow.appendChild(seatElement);
+
+            if (AllUserSeatArray.includes(seat.id)) { //AllUserSeatArray에 있는 숫자가 내가 생성하고 있는 seat의 id와 일치하다면 실행
+
+                if (CleanedLoginUserSeatArray.includes(seat.id)) {
+                    seat.reservedBy = 'self';
+                    selectedSeats.push(seat);
+                } else seat.reservedBy = 'other';
+
+                seatElement.classList.add('reserved');
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
         });
-}
+        seatingPlanElement.appendChild(seatingRow);
+    }
+    updateReservedSeatsText();
+});
 
-updateReservedSeatsText();
 
 document.getElementById('bookSeats').addEventListener('click', bookSelectedSeats);
 
-// 페이지 로드시 예약된 좌석 정보 초기화
-fetchBookedSeats();
