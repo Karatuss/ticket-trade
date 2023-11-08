@@ -9,6 +9,10 @@
 </head>
 
 <body>
+
+<a th:attr="Login-User-Seat=${loginUserSeat}"></a>
+<a th:attr="Seat-Reserved=${seatReserved}"></a>
+
 <div id=title>
     <h1>좌석을 선택하세요</h1>
 </div>
@@ -25,6 +29,8 @@
     <h2>예약한 좌석 목록</h2>
     <ul></ul>
 </div>
+
+
 
 <script src="/js/bookSeats.js"></script>
 <script src="/js/logout.js"></script>
