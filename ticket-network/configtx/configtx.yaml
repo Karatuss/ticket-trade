@@ -12,7 +12,8 @@ Organizations:
   - &OrdererOrg
     Name: OrdererOrg
     ID: OrdererMSP
-    MSPDir: ../organizations/ordererOrganizations/ticket.com/msp
+    # MSPDir: ../organizations/ordererOrganizations/ticket.com/msp
+    MSPDir: ../organizations/ordererOrganizations/ticket.com/orderers/orderer.ticket.com/msp
     Policies:
       Readers:
         Type: Signature
@@ -28,7 +29,8 @@ Organizations:
   - &Seller
     Name: SellerMSP
     ID: SellerMSP
-    MSPDir: ../organizations/peerOrganizations/seller.ticket.com/msp
+    # MSPDir: ../organizations/peerOrganizations/seller.ticket.com/msp
+    MSPDir: ../organizations/peerOrganizations/seller.ticket.com/users/Admin@seller.ticket.com/msp
     Policies:
       Readers:
         Type: Signature
@@ -41,11 +43,12 @@ Organizations:
         Rule: "OR('SellerMSP.admin')"
       Endorsement:
         Type: Signature
-        Rule: "OR('SellerMSP.peer')"
+        Rule: "OR('SellerMSP.peer', 'SellerMSP.admin')"
   - &Buyer
     Name: BuyerMSP
     ID: BuyerMSP
-    MSPDir: ../organizations/peerOrganizations/buyer.ticket.com/msp
+    # MSPDir: ../organizations/peerOrganizations/buyer.ticket.com/msp
+    MSPDir: ../organizations/peerOrganizations/buyer.ticket.com/users/Admin@buyer.ticket.com/msp
     Policies:
       Readers:
         Type: Signature
@@ -58,7 +61,7 @@ Organizations:
         Rule: "OR('BuyerMSP.admin')"
       Endorsement:
         Type: Signature
-        Rule: "OR('BuyerMSP.peer')"
+        Rule: "OR('BuyerMSP.peer', 'BuyerMSP.admin')"
 ################################################################################
 #
 #   SECTION: Capabilities

@@ -175,7 +175,7 @@ function createOrgs() {
   # Create crypto material using Fabric CA
   if [ "$CRYPTO" == "Certificate Authorities" ]; then
     infoln "Generating certificates using Fabric CA"
-    ${CONTAINER_CLI_COMPOSE} -f compose/$CONTAINER_CLI/${CONTAINER_CLI}-$COMPOSE_FILE_CA up -d 2>&1
+    ${CONTAINER_CLI_COMPOSE} -f compose/$COMPOSE_FILE_CA -f compose/$CONTAINER_CLI/${CONTAINER_CLI}-$COMPOSE_FILE_CA up -d 2>&1
 
     . organizations/fabric-ca/registerEnroll.sh
 
@@ -242,10 +242,12 @@ function networkUp() {
     createOrgs
   fi
 
-  COMPOSE_FILES="-f compose/${CONTAINER_CLI}/${CONTAINER_CLI}-${COMPOSE_FILE_BASE}"
+  COMPOSE_FILES="-f compose/${COMPOSE_FILE_BASE}"
+  # COMPOSE_FILES="-f compose/${COMPOSE_FILE_BASE} -f compose/${CONTAINER_CLI}/${CONTAINER_CLI}-${COMPOSE_FILE_BASE}"
+  # COMPOSE_FILES="-f compose/${CONTAINER_CLI}/${CONTAINER_CLI}-${COMPOSE_FILE_BASE}"
 
   if [ "${DATABASE}" == "couchdb" ]; then
-    COMPOSE_FILES="${COMPOSE_FILES} -f compose/${CONTAINER_CLI}/${CONTAINER_CLI}-${COMPOSE_FILE_COUCH}"
+    COMPOSE_FILES="${COMPOSE_FILES} -f compose/${COMPOSE_FILE_COUCH} -f compose/${CONTAINER_CLI}/${CONTAINER_CLI}-${COMPOSE_FILE_COUCH}"
   fi
 
   DOCKER_SOCK="${DOCKER_SOCK}" ${CONTAINER_CLI_COMPOSE} ${COMPOSE_FILES} up -d 2>&1
@@ -256,13 +258,67 @@ function networkUp() {
   fi
 }
 
+# call the script to create the channel, join the peers of org1 and org2,
+# and then update the anchor peers for each organization
+function createChannel() {
+  # Bring up the network if it is not already up.
+  bringUpNetwork="false"
+
+  local bft_true=$1
+
+  if ! $CONTAINER_CLI info > /dev/null 2>&1 ; then
+    fatalln "$CONTAINER_CLI network is required to be running to create a channel"
+  fi
+
+  # check if all containers are present
+  CONTAINERS=($($CONTAINER_CLI ps | grep hyperledger/ | awk '{print $2}'))
+  len=$(echo ${#CONTAINERS[@]})
+
+  if [[ $len -ge 4 ]] && [[ ! -d "organizations/peerOrganizations" ]]; then
+    echo "Bringing network down to sync certs with containers"
+    networkDown
+  fi
+
+  [[ $len -lt 4 ]] || [[ ! -d "organizations/peerOrganizations" ]] && bringUpNetwork="true" || echo "Network Running Already"
+
+  if [ $bringUpNetwork == "true"  ]; then
+    infoln "Bringing up network"
+    networkUp
+  fi
+
+  # now run the script that creates a channel. This script uses configtxgen once
+  # to create the channel creation transaction and the anchor peer updates.
+  scripts/createChannel.sh $CHANNEL_NAME $CLI_DELAY $MAX_RETRY $VERBOSE $bft_true
+}
+
+## Call the script to deploy a chaincode to the channel
+function deployCC() {
+  scripts/deployCC.sh $CHANNEL_NAME $CC_NAME $CC_SRC_PATH $CC_SRC_LANGUAGE $CC_VERSION $CC_SEQUENCE $CC_INIT_FCN $CC_END_POLICY $CC_COLL_CONFIG $CLI_DELAY $MAX_RETRY $VERBOSE
+
+  if [ $? -ne 0 ]; then
+    fatalln "Deploying chaincode failed"
+  fi
+}
+
+## Call the script to deploy a chaincode to the channel
+function deployCCAAS() {
+  scripts/deployCCAAS.sh $CHANNEL_NAME $CC_NAME $CC_SRC_PATH $CCAAS_DOCKER_RUN $CC_VERSION $CC_SEQUENCE $CC_INIT_FCN $CC_END_POLICY $CC_COLL_CONFIG $CLI_DELAY $MAX_RETRY $VERBOSE $CCAAS_DOCKER_RUN
+
+  if [ $? -ne 0 ]; then
+    fatalln "Deploying chaincode-as-a-service failed"
+  fi
+}
+
 # Tear down running network
 function networkDown() {
   local temp_compose=$COMPOSE_FILE_BASE
   COMPOSE_FILE_BASE=compose-net.yaml
-  COMPOSE_BASE_FILES="-f compose/${CONTAINER_CLI}/${CONTAINER_CLI}-${COMPOSE_FILE_BASE}"
-  COMPOSE_COUCH_FILES="-f compose/${CONTAINER_CLI}/${CONTAINER_CLI}-${COMPOSE_FILE_COUCH}"
-  COMPOSE_CA_FILES="-f compose/${CONTAINER_CLI}/${CONTAINER_CLI}-${COMPOSE_FILE_CA}"
+  COMPOSE_BASE_FILES="-f compose/${COMPOSE_FILE_BASE} -f compose/${CONTAINER_CLI}/${CONTAINER_CLI}-${COMPOSE_FILE_BASE}"
+  COMPOSE_COUCH_FILES=""
+  if [ "${DATABASE}" == "couchdb" ]; then
+    COMPOSE_COUCH_FILES="-f compose/${COMPOSE_FILE_COUCH} -f compose/${CONTAINER_CLI}/${CONTAINER_CLI}-${COMPOSE_FILE_COUCH}"
+  fi
+  COMPOSE_CA_FILES="-f compose/${COMPOSE_FILE_CA} -f compose/${CONTAINER_CLI}/${CONTAINER_CLI}-${COMPOSE_FILE_CA}"
   COMPOSE_FILES="${COMPOSE_BASE_FILES} ${COMPOSE_COUCH_FILES} ${COMPOSE_CA_FILES}"
 
   # stop org3 containers also in addition to seller and buyer, in case we were running sample to add org3
@@ -313,8 +369,8 @@ CRYPTO="cryptogen"
 MAX_RETRY=5
 # default for delay between commands
 CLI_DELAY=3
-# channel name defaults to "ticket-booth"
-CHANNEL_NAME="ticket-booth"
+# channel name defaults to "ticket-channel"
+CHANNEL_NAME="ticket-channel"
 # chaincode name defaults to "NA"
 CC_NAME="NA"
 # chaincode path defaults to "NA"
@@ -323,6 +379,8 @@ CC_SRC_PATH="NA"
 CC_END_POLICY="NA"
 # collection configuration defaults to "NA"
 CC_COLL_CONFIG="NA"
+# channel config policy - @TwoPair
+CC_CHANNEL_CONFIG="Channel/Application/Endorsement"
 # chaincode init function defaults to "NA"
 CC_INIT_FCN="NA"
 # use this as the default docker-compose yaml definition
@@ -341,7 +399,7 @@ COMPOSE_FILE_ORG3_CA=compose-ca-org3.yaml
 # chaincode language defaults to "NA"
 CC_SRC_LANGUAGE="NA"
 # default to running the docker commands for the CCAAS
-CCAAS_DOCKER_RUN=true
+CCAAS_DOCKER_RUN=false  # Do not need to ccaas docker build - @TwoPair
 # Chaincode version
 CC_VERSION="1.0"
 # Chaincode definition sequence
@@ -481,9 +539,9 @@ elif [ "$MODE" == "createChannel" ]; then
   infoln "If network is not up, starting nodes with CLI timeout of '${MAX_RETRY}' tries and CLI delay of '${CLI_DELAY}' seconds and using database '${DATABASE} ${CRYPTO_MODE}"
   createChannel $BFT
 elif [ "$MODE" == "down" ]; then
-  infoln "I need to rework this... so don't use this command now..."
+  # infoln "I need to rework this... so don't use this command now..."
   infoln "Stopping network"
-  # networkDown
+  networkDown
 elif [ "$MODE" == "restart" ]; then
   infoln "Restarting network"
   networkDown
