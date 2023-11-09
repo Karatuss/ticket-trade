@@ -62,6 +62,7 @@ public class EventService {
     }
 
     public HashMap<String, Object> userEventList(String loginUser) {
+
         // access to bucket
         Bucket eventBucket = cluster.bucket(EventConfig.getStaticBucketName());
         Collection eventCollection = eventBucket.defaultCollection();
@@ -79,16 +80,19 @@ public class EventService {
 
         // return whole event list
         if (loginUser == null) {
-            for (int i = 1; i <= eventNum; i++) {
+            for (int i = 1; i < eventNum; i++) {
                 eventList.put(String.valueOf(i), eventCollection.get(String.valueOf(i)));
             }
-        }
+        } else {
+            // return event list that login user is participating in
+            JsonArray seatData = userCollection.get(loginUser).contentAsObject().getArray("seat");
 
-        // return event list that login user is participating in
-        JsonArray seatData = userCollection.get(loginUser).contentAsObject().getArray("seat");
-        for (int i = 1; i <= seatData.size(); i++) {
-            String eventId = String.valueOf(seatData.get(i)).split("-")[0];
-            eventList.put(eventId, eventCollection.get(eventId));
+            for (int i = 0; i < seatData.size(); i++) {
+                String eventId = String.valueOf(seatData.get(i)).split("-")[0];
+                if (!eventId.equals("null")) {
+                    eventList.put(eventId, eventCollection.get(eventId));
+                }
+            }
         }
 
         return eventList;
