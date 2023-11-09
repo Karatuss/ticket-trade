@@ -26,6 +26,4 @@ public class EventDocument {
 
     @Field
     String eventName;
-
-
 }
