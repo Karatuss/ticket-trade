@@ -21,7 +21,6 @@ import static com.ticket.Ticketing.Ticketing.cluster;
 @Service
 public class EventService {
 
-    //TODO: startEvent/endEvent 를 호출한 쪽에서 loginManager 의 Role 이 Manager 인지 체크
     public void startEvent(SeatService seatService, String loginManager, Integer seatNum, String eventName) {
         // access to bucket
         Bucket eventBucket = cluster.bucket(EventConfig.getStaticBucketName());
@@ -81,7 +80,7 @@ public class EventService {
         // return whole event list
         if (loginUser == null) {
             for (int i = 1; i < eventNum; i++) {
-                eventList.put(String.valueOf(i), eventCollection.get(String.valueOf(i)));
+                eventList.put(String.valueOf(i), eventCollection.get(String.valueOf(i)).contentAsObject());
             }
         } else {
             // return event list that login user is participating in
@@ -90,7 +89,7 @@ public class EventService {
             for (int i = 0; i < seatData.size(); i++) {
                 String eventId = String.valueOf(seatData.get(i)).split("-")[0];
                 if (!eventId.equals("null")) {
-                    eventList.put(eventId, eventCollection.get(eventId));
+                    eventList.put(eventId, eventCollection.get(eventId).contentAsObject());
                 }
             }
         }
@@ -145,7 +144,8 @@ public class EventService {
                 JsonObject content = userCollection.get(key).contentAsObject();
                 String event = String.valueOf(content.get("seat")).split("-")[0];
                 if (event.equals(eventId)) {
-                    stringList.add(String.valueOf(content.get("id")));
+                    String userId = String.valueOf(content.get("id"));
+                    stringList.add(String.valueOf(userCollection.get(userId).contentAsObject()));
                 }
             }
         } finally {
