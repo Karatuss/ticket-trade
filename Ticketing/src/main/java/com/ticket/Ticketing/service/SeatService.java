@@ -29,7 +29,7 @@ public class SeatService {
             String documentId = eventId + "-" + String.format("%03d", i);
             if (!documentExists(seatCollection, documentId)) {   // don't make initial documents if already exist
                 JsonObject jsonData = JsonObject.create()
-                        .put("id", String.valueOf(i))
+                        .put("id", String.format("%03d", i))
                         .put("sold", false);
                 seatCollection.insert(documentId, jsonData);
             }
@@ -96,6 +96,25 @@ public class SeatService {
         }
 
         return seatReserved;
+    }
+
+    public void updateSeat(List<Integer> seatList) {
+        Bucket seatBucket = cluster.bucket(SeatConfig.getStaticBucketName());
+        Collection seatCollection = seatBucket.defaultCollection();
+
+        // update seat info from seat bucket
+        for (Integer seatNum : seatList) {
+            String documentId = String.format("%03d", seatNum);
+
+            // check if seat already sold out
+            Object seatResult = seatCollection.get(documentId).contentAsObject().get("sold");
+            if (seatResult.equals(false)) {
+                JsonObject jsonData = JsonObject.create()
+                        .put("id", String.format("%03d", Integer.valueOf(documentId)))
+                        .put("sold", true);
+                seatCollection.replace(documentId, jsonData);
+            }
+        }
     }
 
 
