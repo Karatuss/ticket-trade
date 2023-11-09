@@ -1,31 +1,26 @@
 package com.ticket.Ticketing.controller;
 
 
-import com.couchbase.client.core.deps.com.google.protobuf.StringValue;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Collection;
 import com.couchbase.client.java.json.JsonObject;
-import com.couchbase.client.java.kv.GetResult;
-import com.couchbase.client.java.manager.query.QueryIndex;
 import com.couchbase.client.java.query.QueryOptions;
 import com.couchbase.client.java.query.QueryResult;
 import com.ticket.Ticketing.config.SeatConfig;
 import com.ticket.Ticketing.config.UserConfig;
+import com.ticket.Ticketing.domain.repository.Role;
 import com.ticket.Ticketing.domain.repository.SessionConst;
+import com.ticket.Ticketing.service.EventService;
+import com.ticket.Ticketing.service.SeatService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,9 +32,9 @@ import static com.ticket.Ticketing.Ticketing.cluster;
 @AllArgsConstructor
 @SessionAttributes("user")
 public class GetController {
-//    private final UserService userService;
-//    private final SeatService seatService;
-
+    //    private final UserService userService;
+    private final SeatService seatService;
+    private final EventService eventService;
 
     @GetMapping("/")
     public String none() {
@@ -83,18 +78,14 @@ public class GetController {
     }
 
 
+    // TODO: user-event-seat 만들고 /seat 삭제 예정
     @GetMapping(value = "/seat")
     public String setSeat(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) String loginUser, HttpServletRequest request, Model model) {
-        // check login member user
-        if (loginUser == null) {
-            return "index";
-        }
-
         // if normally checked login get session
         HttpSession session = request.getSession(false);
 
-        // check session is maintained
-        if (session == null) {
+        // check session and login user exist
+        if (session == null || loginUser == null) {
             return "index";
         }
 
@@ -111,7 +102,7 @@ public class GetController {
 
         // add reserved seats info to model
         List<String> seatReserved = new ArrayList<>();
-        for (int i = 1; i < 21; i++) {
+        for (int i = 1; i <= 20; i++) {  //TODO: 20 >> EventService.getSeatNum
             JsonObject seatInfo = seatCollection.get(String.format("%03d", i)).contentAsObject();
             if (seatInfo.getBoolean("sold")) {
                 seatReserved.add((String) seatInfo.get("id"));
@@ -125,17 +116,11 @@ public class GetController {
 
     @GetMapping(value = "/manager")
     public String manager(@SessionAttribute(name = SessionConst.LOGIN_MANAGER, required = false) String loginManager, HttpServletRequest request, Model model) {
-
-        // check login user
-        if (loginManager == null) {
-            return "index";
-        }
-
         // if normally checked login get session
         HttpSession session = request.getSession(false);
 
-        // check session is maintained
-        if (session == null) {
+        // check session and login manager exist
+        if (session == null || loginManager == null) {
             return "index";
         }
 
@@ -154,22 +139,102 @@ public class GetController {
             // get all keys from every documents by using N1QL query
             String query = "SELECT RAW META().id FROM `" + UserConfig.getStaticBucketName() + "`";
             QueryResult result = cluster.query(query, QueryOptions.queryOptions());
-            List<String> keys = result.rowsAs(String.class);
 
             // save data to model for giving data to front-end
-            int num = 1;
-            for (String key : keys) {
-                model.addAttribute("user" + (num++), userCollection.get(key).contentAsObject());
-            }
+            List<String> keys = result.rowsAs(String.class);
+            HashMap<String, Object> userInfo = new HashMap<>();
 
+            int i = 1;
+            for (String key : keys) {
+                if (userCollection.get(key).contentAsObject().get("role").equals(String.valueOf(Role.MEMBER))) {
+                    userInfo.put(String.valueOf(i++), userCollection.get(key).contentAsObject());
+                }
+            }
+            model.addAttribute("user", userInfo);
         } finally {
             // delete primary index
             cluster.query("DROP INDEX `" + UserConfig.getStaticBucketName() + "`.`#primary`", QueryOptions.queryOptions());
         }
 
         return "manager";
-
     }
 
+    @GetMapping("/user-event")
+    public String userEvent(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) String loginUser
+            , HttpServletRequest request, Model model) {
+        // if normally checked login get session
+        HttpSession session = request.getSession(false);
+
+        // check session and login user exist
+        if (session == null || loginUser == null) {
+            return "index";
+        }
+
+        // put whole event list to model
+        model.addAttribute("wholeEvent", eventService.userEventList(null));
+
+        // put event list user is participating in to model
+        model.addAttribute("userEvent", eventService.userEventList(loginUser));
+
+        return "user-event";
+    }
+
+    @GetMapping("/user-event-seat")
+    public String userEventSeat(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) String loginUser,
+                                @SessionAttribute(name = SessionConst.CURRENT_EVENT_ID, required = false) String currentEventId,
+                                HttpServletRequest request, Model model) {
+        // if normally checked login get session
+        HttpSession session = request.getSession(false);
+
+        // check session and login user exist
+        if (session == null || loginUser == null) {
+            return "index";
+        }
+
+        // put current event info
+        model.addAttribute("userEvent", currentEventId);
+
+        // put reserved seat of current event id by all users
+        model.addAttribute("allReservedSeat", seatService.seatList(currentEventId, null));
+
+        // put reserved seat of current event id by login user
+        model.addAttribute("userReservedSeat", seatService.seatList(currentEventId, loginUser));
+
+        return "user-event-seat";
+    }
+
+    @GetMapping("/manager-event")
+    public String managerEvent(@SessionAttribute(name = SessionConst.LOGIN_MANAGER, required = false) String loginManager
+            , HttpServletRequest request, Model model) {
+        // if normally checked login get session
+        HttpSession session = request.getSession(false);
+
+        // check session and login user exist
+        if (session == null || loginManager == null) {
+            return "index";
+        }
+
+        // get event list login manager created
+        List<String> eventList = eventService.managerEventList(loginManager);
+
+        // put event list
+        model.addAttribute("managerEventList", eventList);
+
+        return "manager-event";
+    }
+
+    @GetMapping("/manager-event-generate")
+    public String managerEventGenerate(@SessionAttribute(name = SessionConst.LOGIN_MANAGER, required = false) String loginManager,
+                                       HttpServletRequest request) {
+        // if normally checked login get session
+        HttpSession session = request.getSession(false);
+
+        // check session and login user exist
+        if (session == null || loginManager == null) {
+            return "index";
+        }
+        
+        return "manager-event-generate";
+    }
 
 }

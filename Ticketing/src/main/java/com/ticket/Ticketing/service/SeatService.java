@@ -3,12 +3,17 @@ package com.ticket.Ticketing.service;
 import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Collection;
+import com.couchbase.client.java.json.JsonArray;
 import com.couchbase.client.java.json.JsonObject;
+import com.ticket.Ticketing.config.EventConfig;
 import com.ticket.Ticketing.config.SeatConfig;
+import com.ticket.Ticketing.config.UserConfig;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.ticket.Ticketing.Ticketing.cluster;
 
@@ -16,23 +21,33 @@ import static com.ticket.Ticketing.Ticketing.cluster;
 @AllArgsConstructor
 public class SeatService {
 
-    //TODO 추후에 manager가 관리하게 변경
-    private final static int totalSeats = 20;
-
-    public void createSeatDocuments() {
+    public void createSeatDocuments(String eventId, Integer totalSeats) {
         Bucket seatBucket = cluster.bucket(SeatConfig.getStaticBucketName());
         Collection seatCollection = seatBucket.defaultCollection();
 
         for (int i = 1; i <= totalSeats; i++) {
-            String documentId = String.format("%03d", i);
-            if(!documentExists(seatCollection, documentId)) {   // don't make initial documents if already exist
+            String documentId = eventId + "-" + String.format("%03d", i);
+            if (!documentExists(seatCollection, documentId)) {   // don't make initial documents if already exist
                 JsonObject jsonData = JsonObject.create()
-                        .put("id", String.valueOf(i))   //TODO id를 eventName001로 변경 예정
+                        .put("id", String.valueOf(i))
                         .put("sold", false);
                 seatCollection.insert(documentId, jsonData);
             }
         }
     }
+
+    public void deleteSeatByEventDocuments(String eventId, Integer seatNum) {
+        Bucket seatBucket = cluster.bucket(SeatConfig.getStaticBucketName());
+        Collection seatCollection = seatBucket.defaultCollection();
+
+        for (int i = 1; i <= seatNum; i++) {
+            String documentId = eventId + "-" + String.format("%03d", i);
+            if (documentExists(seatCollection, documentId)) {
+                seatCollection.remove(documentId);
+            }
+        }
+    }
+
     private boolean documentExists(Collection collection, String documentId) {
         try {
             collection.get(documentId);
@@ -41,79 +56,47 @@ public class SeatService {
             return false; // Document not exists
         }
     }
-    public void deleteAllSeatDocuments(){
+
+    public List<String> seatList(String eventId, String loginUser) {
+        // access to buckets
+        Bucket userBucket = cluster.bucket(UserConfig.getStaticBucketName());
+        Collection userCollection = userBucket.defaultCollection();
+
+        Bucket eventBucket = cluster.bucket(EventConfig.getStaticBucketName());
+        Collection eventCollection = eventBucket.defaultCollection();
+
         Bucket seatBucket = cluster.bucket(SeatConfig.getStaticBucketName());
         Collection seatCollection = seatBucket.defaultCollection();
 
-        for (int i = 1; i <= totalSeats; i++) {
-            String documentId = String.format("%03d", i);
-            if(documentExists(seatCollection, documentId)) {
-                seatCollection.remove(documentId);
+        // add reserved seats info to model
+        List<String> seatReserved = new ArrayList<>();
+        JsonArray seatUserReserved;
+        Integer seatNumOfEvent;
+
+        // whole seat list of event
+        if (loginUser == null) {
+            seatNumOfEvent = eventCollection.get(eventId).contentAsObject().getInt("seatNum");
+            for (int i = 1; i <= seatNumOfEvent; i++) {
+                JsonObject seatInfo = seatCollection.get(eventId + "-" + String.format("%03d", i)).contentAsObject();
+                if (seatInfo.getBoolean("sold")) {
+                    seatReserved.add(String.valueOf(seatInfo.get("id")).split("-")[1]);
+                }
+            }
+        } else { // user seat list of event
+            seatUserReserved = userCollection.get(loginUser).contentAsObject().getArray("seat");
+
+            // check event of reserved seat whether it is same with eventId
+            for (Object seatInfo : seatUserReserved) {
+                String[] tempUserSeat = String.valueOf(seatInfo).split("-");
+                // tempUserSeat is composed of "eventName-seatNum"
+                if (tempUserSeat[0].equals(eventId)) {
+                    seatReserved.add(tempUserSeat[1]);
+                }
             }
         }
-    }
 
-    /*
-    // READ
-    public List<SeatDto> getSeatList(){
-        // return dto list made by dto got from couchbase
-        String n1qlQuery = "SELECT * FROM `" + SeatConfig.getStaticBucketName() + "`";
-        QueryResult queryResult = cluster.query(n1qlQuery, QueryOptions.queryOptions().adhoc(true));
-
-        List<SeatDto> seatDtoList = new ArrayList<>();
-
-        for (JsonObject row : queryResult.rowsAsObject()) {
-            SeatDto dto = new SeatDto();
-            dto.setId(row.getString("id"));
-            dto.setSold(row.getBoolean("sold"));
-            // 필요한 다른 필드 설정
-            seatDtoList.add(dto);
-        }
-        return seatDtoList;
-    }
-
-    public int getTotalSeats(){
-        return totalSeats;
+        return seatReserved;
     }
 
 
-
-    // UPDATE
-    private SeatDocument updateSeatDocument(SeatDto seatDto){
-        return SeatDocument.builder()
-                .id(seatDto.getId())
-                .sold(seatDto.getSold())
-                .build();
-    }
-
-    public void setSeatList(SeatDto seatDto){
-
-        seatRepository.save(this.updateSeatDocument(seatDto));
-    }
-
-    // DELETE
-    public void deleteSeatList(SeatDto seatDto){
-        seatRepository.delete(this.updateSeatDocument(seatDto));
-    }
-
-    public void deleteSeatDocuments(Integer id){
-        Bucket seatBucket = cluster.bucket(SeatConfig.getStaticBucketName());
-        Collection seatCollection = seatBucket.defaultCollection();
-        String documentId = String.format("%03d", id);
-
-        if(documentExists(seatCollection, documentId)) {
-            seatCollection.remove(documentId);
-        }
-
-    }
-
-    // convert document to dto
-    private SeatDto convertDocumentToDto(SeatDocument seatDocument) {
-        return SeatDto.builder()
-                .id(seatDocument.getId())
-                .sold(seatDocument.getSold())
-                .build();
-
-    }
-    */
 }
