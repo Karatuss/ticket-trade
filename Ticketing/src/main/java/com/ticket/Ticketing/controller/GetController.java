@@ -3,10 +3,8 @@ package com.ticket.Ticketing.controller;
 
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Collection;
-import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.query.QueryOptions;
 import com.couchbase.client.java.query.QueryResult;
-import com.ticket.Ticketing.config.SeatConfig;
 import com.ticket.Ticketing.config.UserConfig;
 import com.ticket.Ticketing.domain.repository.Role;
 import com.ticket.Ticketing.domain.repository.SessionConst;
@@ -21,7 +19,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -76,43 +73,6 @@ public class GetController {
 
         return "register";
     }
-
-
-    // TODO: user-event-seat 만들고 /seat 삭제 예정
-    @GetMapping(value = "/seat")
-    public String setSeat(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) String loginUser, HttpServletRequest request, Model model) {
-        // if normally checked login get session
-        HttpSession session = request.getSession(false);
-
-        // check session and login user exist
-        if (session == null || loginUser == null) {
-            return "index";
-        }
-
-        // access to buckets
-        Bucket seatBucket = cluster.bucket(SeatConfig.getStaticBucketName());
-        Collection seatCollection = seatBucket.defaultCollection();
-
-        Bucket userBucket = cluster.bucket(UserConfig.getStaticBucketName());
-        Collection userCollection = userBucket.defaultCollection();
-
-        // add login user's seats info to model
-        Object loginUserSeat = userCollection.get(loginUser).contentAsObject().get("seat");
-        model.addAttribute("loginUserSeat", loginUserSeat);
-
-        // add reserved seats info to model
-        List<String> seatReserved = new ArrayList<>();
-        for (int i = 1; i <= 20; i++) {  //TODO: 20 >> EventService.getSeatNum
-            JsonObject seatInfo = seatCollection.get(String.format("%03d", i)).contentAsObject();
-            if (seatInfo.getBoolean("sold")) {
-                seatReserved.add((String) seatInfo.get("id"));
-            }
-        }
-        model.addAttribute("seatReserved", seatReserved);
-
-        return "seat";
-    }
-
 
     @GetMapping(value = "/manager")
     public String manager(@SessionAttribute(name = SessionConst.LOGIN_MANAGER, required = false) String loginManager, HttpServletRequest request, Model model) {
@@ -233,7 +193,7 @@ public class GetController {
         if (session == null || loginManager == null) {
             return "index";
         }
-        
+
         return "manager-event-generate";
     }
 
