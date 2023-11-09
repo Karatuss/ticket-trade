@@ -5,6 +5,8 @@ import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Collection;
 import com.couchbase.client.java.json.JsonArray;
 import com.couchbase.client.java.json.JsonObject;
+import com.couchbase.client.java.query.QueryOptions;
+import com.couchbase.client.java.query.QueryResult;
 import com.ticket.Ticketing.config.EventConfig;
 import com.ticket.Ticketing.config.UserConfig;
 import org.springframework.stereotype.Service;
@@ -35,8 +37,7 @@ public class EventService {
                 .put("id", eventNum)
                 .put("managerId", loginManager)
                 .put("seatNum", seatNum)
-                .put("eventName", eventName)
-                .put("participants", (List<String>) null);
+                .put("eventName", eventName);
 
         // create new event on event_bucket by only manager
         eventCollection.insert(String.valueOf(eventNum), jsonData);
@@ -117,15 +118,36 @@ public class EventService {
     }
 
     public List<String> eventParticipantsList(String eventId) {
-        Bucket eventBucket = cluster.bucket(EventConfig.getStaticBucketName());
-        Collection eventCollection = eventBucket.defaultCollection();
+        Bucket userBucket = cluster.bucket(EventConfig.getStaticBucketName());
+        Collection userCollection = userBucket.defaultCollection();
 
-        List<Object> objectList = eventCollection.get(eventId).contentAsObject().getArray("participants").toList();
         List<String> stringList = new ArrayList<>();
-        for (Object obj : objectList) {
-            stringList.add((String) obj);
-        }
 
+        try {
+            // create primary index
+            cluster.query("CREATE PRIMARY INDEX ON `" + UserConfig.getStaticBucketName() + "`", QueryOptions.queryOptions());
+
+            // TODO: 동기 혹은 비동기 처리
+//            // wait for available status
+//            userBucket.waitUntilReady(Duration.ofSeconds(2));
+
+            // get all keys from every documents by using N1QL query
+            String query = "SELECT RAW META().id FROM `" + UserConfig.getStaticBucketName() + "`";
+            QueryResult result = cluster.query(query, QueryOptions.queryOptions());
+
+            List<String> keys = result.rowsAs(String.class);
+
+            for (String key : keys) {
+                JsonObject content = userCollection.get(key).contentAsObject();
+                String event = String.valueOf(content.get("seat")).split("-")[0];
+                if (event.equals(eventId)) {
+                    stringList.add(String.valueOf(content.get("id")));
+                }
+            }
+        } finally {
+            // delete primary index
+            cluster.query("DROP INDEX `" + UserConfig.getStaticBucketName() + "`.`#primary`", QueryOptions.queryOptions());
+        }
         return stringList;
     }
 

@@ -9,8 +9,6 @@ import org.springframework.data.couchbase.core.mapping.Field;
 import org.springframework.data.couchbase.core.mapping.id.GeneratedValue;
 import org.springframework.data.couchbase.core.mapping.id.GenerationStrategy;
 
-import java.util.List;
-
 @Builder
 @Data
 @AllArgsConstructor
@@ -29,7 +27,5 @@ public class EventDocument {
     @Field
     String eventName;
 
-    @Field
-    List<String> participants;
 
 }

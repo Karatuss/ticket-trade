@@ -2,8 +2,6 @@ package com.ticket.Ticketing.dto;
 
 import lombok.*;
 
-import java.util.List;
-
 @Builder
 @Getter
 @Setter
@@ -14,5 +12,4 @@ public class EventDto {
     private String managerId;
     private Integer seatNum;
     private String eventName;
-    private List<String> participants;
 }
