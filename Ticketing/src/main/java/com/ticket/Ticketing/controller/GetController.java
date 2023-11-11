@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.bind.annotation.SessionAttributes;
 
-import java.util.List;
+import java.util.HashMap;
 
 
 @Controller
@@ -126,7 +126,7 @@ public class GetController {
         }
 
         // get event list login manager created
-        List<String> eventList = eventService.managerEventList(loginManager);
+        HashMap<String, String> eventList = eventService.managerEventList(loginManager);
 
         // put event list
         model.addAttribute("managerEventList", eventList);

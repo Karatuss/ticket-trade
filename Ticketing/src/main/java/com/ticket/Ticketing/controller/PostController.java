@@ -265,7 +265,7 @@ public class PostController {
                 throw new IllegalStateException();
             }
             // check login manager exists
-            if (!loginManager.equals(SessionConst.LOGIN_MANAGER)) { // login exception
+            if (loginManager == null) { // login exception
                 throw new LoginException();
             }
 
@@ -302,7 +302,7 @@ public class PostController {
                 throw new IllegalStateException();
             }
             // check login manager exists
-            if (!loginManager.equals(SessionConst.LOGIN_MANAGER)) { // login exception
+            if (loginManager == null) { // login exception
                 throw new LoginException();
             }
 

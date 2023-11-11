@@ -97,7 +97,7 @@ public class EventService {
         return eventList;
     }
 
-    public List<String> managerEventList(String loginManager) {
+    public HashMap<String, String> managerEventList(String loginManager) {
 
         Bucket eventBucket = cluster.bucket(EventConfig.getStaticBucketName());
         Collection eventCollection = eventBucket.defaultCollection();
@@ -109,11 +109,12 @@ public class EventService {
         }
 
         // return event list login manager created
-        List<String> eventList = new ArrayList<>();
+        HashMap<String, String> eventList = new HashMap<>();
+
         for (int i = 1; i < eventNum; i++) {
             JsonObject event = eventCollection.get(String.valueOf(i)).contentAsObject();
             if (event.getString("managerId").equals(loginManager)) {
-                eventList.add(event.getString("id"));
+                eventList.put(String.valueOf(i), String.valueOf(event));
             }
         }
 
@@ -121,7 +122,7 @@ public class EventService {
     }
 
     public List<String> eventParticipantsList(String eventId) {
-        Bucket userBucket = cluster.bucket(EventConfig.getStaticBucketName());
+        Bucket userBucket = cluster.bucket(UserConfig.getStaticBucketName());
         Collection userCollection = userBucket.defaultCollection();
 
         List<String> stringList = new ArrayList<>();
@@ -142,7 +143,7 @@ public class EventService {
 
             for (String key : keys) {
                 JsonObject content = userCollection.get(key).contentAsObject();
-                String event = String.valueOf(content.get("seat")).split("-")[0];
+                String event = String.valueOf(content.getArray("seat").getString(0)).split("-")[0];
                 if (event.equals(eventId)) {
                     String userId = String.valueOf(content.get("id"));
                     stringList.add(String.valueOf(userCollection.get(userId).contentAsObject()));
