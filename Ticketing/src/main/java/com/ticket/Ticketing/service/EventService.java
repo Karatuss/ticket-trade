@@ -110,8 +110,8 @@ public class EventService {
 
         // return event list login manager created
         List<String> eventList = new ArrayList<>();
-        for (int i = 1; i <= eventNum; i++) {
-            JsonObject event = eventCollection.get(String.valueOf(eventNum)).contentAsObject();
+        for (int i = 1; i < eventNum; i++) {
+            JsonObject event = eventCollection.get(String.valueOf(i)).contentAsObject();
             if (event.getString("managerId").equals(loginManager)) {
                 eventList.add(event.getString("id"));
             }
