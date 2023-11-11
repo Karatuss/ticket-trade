@@ -42,7 +42,7 @@ public class PostController {
     private final SeatService seatService;
     private final UserService userService;
 
-    // Register
+    // REGISTER
     @PostMapping(value = "/register")
     public ResponseEntity<Object> register(@RequestBody HashMap<String, Object> registerData) {
         try {
@@ -67,7 +67,7 @@ public class PostController {
         }
     }
 
-    // Login
+    // LOGIN
     @PostMapping(value = "/login")
     public ResponseEntity<Object> login(@RequestBody HashMap<String, Object> loginData, HttpServletRequest request) {
         try {
@@ -152,6 +152,7 @@ public class PostController {
 
     }
 
+    // USER
     @PostMapping(value = "user-event")
     public ResponseEntity<Object> userEvent(@RequestBody HashMap<String, Object> userEventData,
                                             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) String loginUser,
@@ -249,43 +250,7 @@ public class PostController {
 
     }
 
-    // Admin
-    @PostMapping(value = "/manager")
-    public ResponseEntity<Object> manager(@RequestBody HashMap<String, Object> managerData,
-                                          @SessionAttribute(name = SessionConst.LOGIN_MANAGER, required = false) String loginManager,
-                                          HttpServletRequest request) {
-        try {
-            // get session
-            HttpSession session = request.getSession(false);
-
-            // check session is maintained
-            if (session == null) {
-                throw new IllegalStateException();
-            }
-            // check login manager exists
-            if (!loginManager.equals(SessionConst.LOGIN_MANAGER)) { // login exception
-                throw new LoginException();
-            }
-
-            if (managerData.get("logout").equals("logout")) { // logout
-                session.invalidate(); // delete session
-            }
-
-            return ResponseEntity.status(HttpStatus.OK)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(managerData);
-
-        } catch (IllegalStateException | LoginException e) { // session or login error
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(managerData);
-        } catch (Exception e) { // network server connect error
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(managerData);
-        }
-    }
-
-
+    // MANAGER
     @PostMapping(value = "manager-event")
     public ResponseEntity<Object> managerEvent(@RequestBody HashMap<String, Object> managerData,
                                                @SessionAttribute(name = SessionConst.LOGIN_MANAGER, required = false) String loginManager,
@@ -300,7 +265,7 @@ public class PostController {
                 throw new IllegalStateException();
             }
             // check login manager exists
-            if (!loginManager.equals(SessionConst.LOGIN_MANAGER)) { // login exception
+            if (loginManager == null) { // login exception
                 throw new LoginException();
             }
 
@@ -337,7 +302,7 @@ public class PostController {
                 throw new IllegalStateException();
             }
             // check login manager exists
-            if (!loginManager.equals(SessionConst.LOGIN_MANAGER)) { // login exception
+            if (loginManager == null) { // login exception
                 throw new LoginException();
             }
 
