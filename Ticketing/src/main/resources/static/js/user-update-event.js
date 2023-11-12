@@ -34,6 +34,7 @@ function AddEventDiv(EventList, key, UserEventList) { //서버로 부터 받아 
     const EventNameElement = document.createElement('div'); // 새로운 div 요소를 생성
 
     EventNameElement.id = key; // EventNameElement의 div id를 서버로부터 받아 온 eventlist의 id로 설정
+    EventNameElement.classList.add('event');
 
     // EventNameElement에 서버로 부터 받아온 이벤트 이름을 삽입
     EventNameElement.innerHTML = ` 
@@ -75,7 +76,7 @@ function FetchEventId(ClickDiv) { //특정 이벤트명을 클릭 시 서버로 
         redirect: 'follow'
     };
 
-    fetch('http://localhost:8080/user-update-event', requestOptions) // 서버에 eventid를 보내고 user-event-seat.html로 이동
+    fetch('http://localhost:8080/user-event', requestOptions) // 서버에 eventid를 보내고 user-event-seat.html로 이동
         // 서버로부터 받은 응답을 response에 json 형식으로 파싱 (response는 서버에서 받은 전체 응답을 의미)
         .then(response => response.json()) // 응답을 JSON 형식으로 파싱
         .then(() => {

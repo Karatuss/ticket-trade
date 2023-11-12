@@ -3,20 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/user-event-style.css">
     <title>이벤트 목록</title>
 </head>
 <body>
-    <a th:attr="event-list=${wholeEvent}"></a>
-    <a th:attr="user-event-list=${userEvent}"></a>
+<a th:attr="event-list=${wholeEvent}"></a>
+<a th:attr="user-event-list=${userEvent}"></a>
 
-    <div id = "event-list">
-        <h1>진행중인 이벤트 목록</h1>
-        <div class = "event-list" id = "event" ></div>
-    </div>
+<div id="event-list">
+    <h1>진행중인 이벤트 목록</h1>
+    <div class="event-list" id="event"></div>
+</div>
 
-    <button id = "logout">로그아웃</button>
+<button id="logout">로그아웃</button>
 
-    <script src="/js/user-update-event.js"></script>
-    <script src="/js/logout.js"></script>
+<script src="/js/user-update-event.js"></script>
+<script src="/js/logout.js"></script>
 </body>
 </html>
