@@ -209,27 +209,23 @@ public class PostController {
                 throw new LoginException();
             }
 
-            if (seatData.containsKey("logout")) { // logout
-                session.invalidate(); // delete session
+            // seat
+            Object dataSeat = seatData.get("selectedSeatIds");
+            Object eventId = seatData.get("eventId");
 
-            } else {  // seat
-                Object dataSeat = seatData.get("selectedSeatIds");
+            List<Integer> seatList = (List<Integer>) dataSeat;
 
-                List<Integer> seatList = (List<Integer>) dataSeat;
-
-                // user check wrong the number of seats
-                if (seatList.isEmpty() || seatList.size() > 2) {
-                    seatData.put("success", false);
-                    throw new IllegalArgumentException();
-                }
-
-                // update userCollection and seatCollection
-                userService.updateUser(loginUser, seatList);
-                seatService.updateSeat(seatList);
-
-                seatData.put("success", true);
+            // user check wrong the number of seats
+            if (seatList.isEmpty() || seatList.size() > 2) {
+                seatData.put("success", false);
+                throw new IllegalArgumentException();
             }
 
+            // update userCollection and seatCollection
+            userService.updateUser(loginUser, seatList, String.valueOf(eventId));
+            seatService.updateSeat(seatList, String.valueOf(eventId));
+
+            seatData.put("success", true);
 
             // return seatData
             return ResponseEntity.status(HttpStatus.OK)
@@ -272,8 +268,13 @@ public class PostController {
             // get event id from manager data
             String eventId = (String) managerData.get("eventId");
 
-            // put event participants list
-            managerData.put("eventParticipantsList", eventService.eventParticipantsList(eventId));
+            // if "remove" is "true", remove all data about eventId
+            if (managerData.get("remove") == "true") {
+                eventService.endEvent(seatService, eventId);
+            } else {
+                // put event participants list
+                managerData.put("eventParticipantsList", eventService.eventParticipantsList(eventId));
+            }
 
             return ResponseEntity.status(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -306,7 +307,7 @@ public class PostController {
                 throw new LoginException();
             }
 
-            Integer seatNum = (Integer) managerData.get("row") * (Integer) managerData.get("col");
+            Integer seatNum = Integer.parseInt(String.valueOf(managerData.get("row"))) * Integer.parseInt(String.valueOf(managerData.get("col")));
             String eventName = (String) managerData.get("eventName");
 
             eventService.startEvent(seatService, loginManager, seatNum, eventName);
