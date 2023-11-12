@@ -1,4 +1,3 @@
-
 #title {
     background-color: #f8f8f8;
     padding: 20px;
@@ -16,38 +15,38 @@ h3 {
 }
 
 #button {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    display: flex;
     justify-content: center;
     margin-top: 50px;
-    
 }
 
-#move-login, #move-event {
+#move-login {
     background-color: #fff;
     border: 1px solid #ccc;
     border-radius: 30px;
     padding: 20px;
     text-align: center;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-    margin-right :200px;
-    margin-left : 200px;
+    margin: 0 auto;
+    min-width: 300px;
+    max-width: 800px;
+    min-height: 200px;
 }
 
-h4 {
-    margin-top: 0;
+h2 {
+    font-size: 32px;
+    margin-bottom: 10px;
 }
 
 button {
-    padding: 10px 20px;
-    font-size: 16px;
+    padding: 15px 30px;
+    font-size: 18px;
     background-color: #007bff;
     color: #fff;
     border: 2px solid #ccc;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
-    margin-top: 10px;
+    margin-top: 20px;
 }
 
 button:hover {
