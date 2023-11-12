@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이벤트 관리</title>
+    <link rel="stylesheet" href="/css/manager-event-style.css">
+
+</head>
+<body>
+<a th:attr="Event-List=${managerEventList}"></a>
+
+<h1 id=Event>이벤트 목록</h1>
+
+<div id="Event_List">
+    <div class="event-list" id="manage_event"></div>
+</div>
+
+<button id="event_generate" onclick="location.href='manager-event-generate'">이벤트 생성하기</button>
+<button id="logout">로그아웃</button>
+
+<script src="/js/manager-update-event.js"></script>
+<script src="/js/logout.js"></script>
+</body>
+</html>

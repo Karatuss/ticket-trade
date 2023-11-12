@@ -1,0 +1,72 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+}
+
+h1 {
+    font-size: 36px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#event_generate {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+#event_generate input {
+    margin-bottom: 10px;
+    padding: 10px;
+    width: calc(50px);
+    box-sizing: border-box;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+
+#event_generate input:first-child {
+    margin-right: 20px;
+    width: auto;
+}
+
+
+#generate,
+#return {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    padding: 12px;
+    font-size: 16px;
+}
+
+#generate {
+    background-color: #007bff;
+    color: #fff;
+    border: 2px solid #007bff;
+    border-radius: 8px;
+    margin-top: 20px; /* 상단 마진 추가 */
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#return {
+    background-color: #007bff; /* 버튼 색상을 변경하려면 원하는 색상으로 수정 */
+    color: #fff;
+    border: 2px solid #007bff;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#generate:hover,
+#return:hover {
+    background-color: #0056b3;
+}
