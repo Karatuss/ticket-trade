@@ -11,7 +11,6 @@ import com.ticket.Ticketing.config.UserConfig;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +28,7 @@ public class SeatService {
             String documentId = eventId + "-" + String.format("%03d", i);
             if (!documentExists(seatCollection, documentId)) {   // don't make initial documents if already exist
                 JsonObject jsonData = JsonObject.create()
-                        .put("id", String.valueOf(i))
+                        .put("id", String.format("%03d", i))
                         .put("sold", false);
                 seatCollection.insert(documentId, jsonData);
             }
@@ -71,12 +70,12 @@ public class SeatService {
         // add reserved seats info to model
         List<String> seatReserved = new ArrayList<>();
         JsonArray seatUserReserved;
-        Integer seatNumOfEvent;
+        String seatNumOfEvent;
 
         // whole seat list of event
         if (loginUser == null) {
-            seatNumOfEvent = eventCollection.get(eventId).contentAsObject().getInt("seatNum");
-            for (int i = 1; i <= seatNumOfEvent; i++) {
+            seatNumOfEvent = String.valueOf(eventCollection.get(eventId).contentAsObject().get("seatNum"));
+            for (int i = 1; i <= Integer.valueOf(seatNumOfEvent); i++) {
                 JsonObject seatInfo = seatCollection.get(eventId + "-" + String.format("%03d", i)).contentAsObject();
                 if (seatInfo.getBoolean("sold")) {
                     seatReserved.add(String.valueOf(seatInfo.get("id")).split("-")[1]);
@@ -96,6 +95,25 @@ public class SeatService {
         }
 
         return seatReserved;
+    }
+
+    public void updateSeat(List<Integer> seatList) {
+        Bucket seatBucket = cluster.bucket(SeatConfig.getStaticBucketName());
+        Collection seatCollection = seatBucket.defaultCollection();
+
+        // update seat info from seat bucket
+        for (Integer seatNum : seatList) {
+            String documentId = String.format("%03d", seatNum);
+
+            // check if seat already sold out
+            Object seatResult = seatCollection.get(documentId).contentAsObject().get("sold");
+            if (seatResult.equals(false)) {
+                JsonObject jsonData = JsonObject.create()
+                        .put("id", String.format("%03d", Integer.valueOf(documentId)))
+                        .put("sold", true);
+                seatCollection.replace(documentId, jsonData);
+            }
+        }
     }
 
 

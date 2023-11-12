@@ -21,7 +21,6 @@ import static com.ticket.Ticketing.Ticketing.cluster;
 @Service
 public class EventService {
 
-    //TODO: startEvent/endEvent 를 호출한 쪽에서 loginManager 의 Role 이 Manager 인지 체크
     public void startEvent(SeatService seatService, String loginManager, Integer seatNum, String eventName) {
         // access to bucket
         Bucket eventBucket = cluster.bucket(EventConfig.getStaticBucketName());
@@ -62,6 +61,7 @@ public class EventService {
     }
 
     public HashMap<String, Object> userEventList(String loginUser) {
+
         // access to bucket
         Bucket eventBucket = cluster.bucket(EventConfig.getStaticBucketName());
         Collection eventCollection = eventBucket.defaultCollection();
@@ -79,22 +79,25 @@ public class EventService {
 
         // return whole event list
         if (loginUser == null) {
-            for (int i = 1; i <= eventNum; i++) {
-                eventList.put(String.valueOf(i), eventCollection.get(String.valueOf(i)));
+            for (int i = 1; i < eventNum; i++) {
+                eventList.put(String.valueOf(i), eventCollection.get(String.valueOf(i)).contentAsObject());
             }
-        }
+        } else {
+            // return event list that login user is participating in
+            JsonArray seatData = userCollection.get(loginUser).contentAsObject().getArray("seat");
 
-        // return event list that login user is participating in
-        JsonArray seatData = userCollection.get(loginUser).contentAsObject().getArray("seat");
-        for (int i = 1; i <= seatData.size(); i++) {
-            String eventId = String.valueOf(seatData.get(i)).split("-")[0];
-            eventList.put(eventId, eventCollection.get(eventId));
+            for (int i = 0; i < seatData.size(); i++) {
+                String eventId = String.valueOf(seatData.get(i)).split("-")[0];
+                if (!eventId.equals("null")) {
+                    eventList.put(eventId, eventCollection.get(eventId).contentAsObject());
+                }
+            }
         }
 
         return eventList;
     }
 
-    public List<String> managerEventList(String loginManager) {
+    public HashMap<String, String> managerEventList(String loginManager) {
 
         Bucket eventBucket = cluster.bucket(EventConfig.getStaticBucketName());
         Collection eventCollection = eventBucket.defaultCollection();
@@ -106,11 +109,12 @@ public class EventService {
         }
 
         // return event list login manager created
-        List<String> eventList = new ArrayList<>();
-        for (int i = 1; i <= eventNum; i++) {
-            JsonObject event = eventCollection.get(String.valueOf(eventNum)).contentAsObject();
+        HashMap<String, String> eventList = new HashMap<>();
+
+        for (int i = 1; i < eventNum; i++) {
+            JsonObject event = eventCollection.get(String.valueOf(i)).contentAsObject();
             if (event.getString("managerId").equals(loginManager)) {
-                eventList.add(event.getString("id"));
+                eventList.put(String.valueOf(i), String.valueOf(event));
             }
         }
 
@@ -118,7 +122,7 @@ public class EventService {
     }
 
     public List<String> eventParticipantsList(String eventId) {
-        Bucket userBucket = cluster.bucket(EventConfig.getStaticBucketName());
+        Bucket userBucket = cluster.bucket(UserConfig.getStaticBucketName());
         Collection userCollection = userBucket.defaultCollection();
 
         List<String> stringList = new ArrayList<>();
@@ -139,9 +143,10 @@ public class EventService {
 
             for (String key : keys) {
                 JsonObject content = userCollection.get(key).contentAsObject();
-                String event = String.valueOf(content.get("seat")).split("-")[0];
+                String event = String.valueOf(content.getArray("seat").getString(0)).split("-")[0];
                 if (event.equals(eventId)) {
-                    stringList.add(String.valueOf(content.get("id")));
+                    String userId = String.valueOf(content.get("id"));
+                    stringList.add(String.valueOf(userCollection.get(userId).contentAsObject()));
                 }
             }
         } finally {
