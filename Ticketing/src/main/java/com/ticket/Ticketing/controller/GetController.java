@@ -110,6 +110,9 @@ public class GetController {
         // put reserved seat of current event id by login user
         model.addAttribute("userReservedSeat", seatService.seatList(currentEventId, loginUser));
 
+        // put seat num of current event id
+        model.addAttribute("seatNum", seatService.numOfSeats(currentEventId));
+
         return "user-event-seat";
     }
 

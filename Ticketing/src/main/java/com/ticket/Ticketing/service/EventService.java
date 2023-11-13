@@ -88,7 +88,7 @@ public class EventService {
 
             for (int i = 0; i < seatData.size(); i++) {
                 String eventId = String.valueOf(seatData.get(i)).split("-")[0];
-                if (!eventId.equals("null")) {
+                if ((!eventId.equals("null")) && !eventId.isEmpty()) {
                     eventList.put(eventId, eventCollection.get(eventId).contentAsObject());
                 }
             }

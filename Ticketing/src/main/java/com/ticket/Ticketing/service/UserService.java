@@ -13,6 +13,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -27,13 +28,21 @@ public class UserService {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    public void updateUser(String loginUser, List<Integer> seatList) {
+    public void updateUser(String loginUser, List<Integer> seatList, String eventId) {
         Bucket userBucket = cluster.bucket(UserConfig.getStaticBucketName());
         Collection userCollection = userBucket.defaultCollection();
 
+        List<String> seatStringList = new ArrayList<>();
+
+        // format seatList
+        for (int i = 0; i < seatList.size(); i++) {
+            String seatInfo = eventId + "-" + seatList.get(i);
+            seatStringList.add(seatInfo);
+        }
+
         // update seat info from user bucket
         JsonObject revisedInfo = userCollection.get(loginUser).contentAsObject();
-        revisedInfo.put("seat", seatList);
+        revisedInfo.put("seat", seatStringList);
 
         userCollection.replace(loginUser, revisedInfo);
     }
