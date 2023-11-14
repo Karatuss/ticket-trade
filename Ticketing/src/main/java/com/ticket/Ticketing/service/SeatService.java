@@ -20,36 +20,48 @@ import static com.ticket.Ticketing.Ticketing.cluster;
 @AllArgsConstructor
 public class SeatService {
 
-    public void createSeatDocuments(String eventId, Integer totalSeats) {
+    public void createSeatDocuments(String eventId, Integer row, Integer col) {
         Bucket seatBucket = cluster.bucket(SeatConfig.getStaticBucketName());
         Collection seatCollection = seatBucket.defaultCollection();
 
-        for (int i = 1; i <= totalSeats; i++) {
-            String documentId = eventId + "-" + String.format("%03d", i);
-            if (!documentExists(seatCollection, documentId)) {   // don't make initial documents if already exist
-                JsonObject jsonData = JsonObject.create()
-                        .put("id", documentId)
-                        .put("sold", false);
-                seatCollection.insert(documentId, jsonData);
+        for (int i = 1; i <= row; i++) {
+            for (int j = 1; j <= col; j++) {
+                String documentId = eventId + "-" + String.format("%03d", i) + ":" + String.format("%03d", j);
+                if (!documentExists(seatCollection, documentId)) { // don't make initial documents if already exist
+                    JsonObject jsonData = JsonObject.create()
+                            .put("id", documentId)
+                            .put("sold", false);
+                    seatCollection.insert(documentId, jsonData);
+                }
             }
         }
     }
 
-    public String numOfSeats(String eventId) {
+    public String rowOfSeats(String eventId) {
         Bucket eventBucket = cluster.bucket(EventConfig.getStaticBucketName());
         Collection eventCollection = eventBucket.defaultCollection();
 
-        return String.valueOf(eventCollection.get(eventId).contentAsObject().get("seatNum"));
+        return String.valueOf(eventCollection.get(eventId).contentAsObject().get("row"));
     }
 
-    public void deleteSeatByEventDocuments(String eventId, Integer seatNum) {
+    public String colOfSeats(String eventId) {
+        Bucket eventBucket = cluster.bucket(EventConfig.getStaticBucketName());
+        Collection eventCollection = eventBucket.defaultCollection();
+
+        return String.valueOf(eventCollection.get(eventId).contentAsObject().get("col"));
+    }
+
+
+    public void deleteSeatByEventDocuments(String eventId, Integer row, Integer col) {
         Bucket seatBucket = cluster.bucket(SeatConfig.getStaticBucketName());
         Collection seatCollection = seatBucket.defaultCollection();
 
-        for (int i = 1; i <= seatNum; i++) {
-            String documentId = eventId + "-" + String.format("%03d", i);
-            if (documentExists(seatCollection, documentId)) {
-                seatCollection.remove(documentId);
+        for (int i = 1; i <= row; i++) {
+            for (int j = 1; j <= col; j++) {
+                String documentId = eventId + "-" + String.format("%03d", i) + ":" + String.format("%03d", j);
+                if (documentExists(seatCollection, documentId)) {
+                    seatCollection.remove(documentId);
+                }
             }
         }
     }
@@ -77,15 +89,19 @@ public class SeatService {
         // add reserved seats info to model
         List<String> seatReserved = new ArrayList<>();
         JsonArray seatUserReserved;
-        String seatNumOfEvent;
+        int row;
+        int col;
 
         // whole seat list of event
         if (loginUser == null) {
-            seatNumOfEvent = String.valueOf(eventCollection.get(eventId).contentAsObject().get("seatNum"));
-            for (int i = 1; i <= Integer.valueOf(seatNumOfEvent); i++) {
-                JsonObject seatInfo = seatCollection.get(eventId + "-" + String.format("%03d", i)).contentAsObject();
-                if (seatInfo.getBoolean("sold")) {
-                    seatReserved.add(String.valueOf(seatInfo.get("id")).split("-")[1]);
+            row = Integer.parseInt(String.valueOf(eventCollection.get(eventId).contentAsObject().get("row")));
+            col = Integer.parseInt(String.valueOf(eventCollection.get(eventId).contentAsObject().get("col")));
+            for (int i = 1; i <= row; i++) {
+                for (int j = 1; j <= col; j++) {
+                    JsonObject seatInfo = seatCollection.get(eventId + "-" + String.format("%03d", i) + ":" + String.format("%03d", j)).contentAsObject();
+                    if (seatInfo.getBoolean("sold")) {
+                        seatReserved.add(String.valueOf(seatInfo.get("id")).split("-")[1]);
+                    }
                 }
             }
         } else { // user seat list of event
@@ -94,7 +110,7 @@ public class SeatService {
             // check event of reserved seat whether it is same with eventId
             for (Object seatInfo : seatUserReserved) {
                 String[] tempUserSeat = String.valueOf(seatInfo).split("-");
-                // tempUserSeat is composed of "eventName-seatNum"
+                // tempUserSeat is composed of "eventName-row:col"
                 if (tempUserSeat[0].equals(eventId)) {
                     seatReserved.add(tempUserSeat[1]);
                 }
@@ -104,21 +120,26 @@ public class SeatService {
         return seatReserved;
     }
 
-    public void updateSeat(List<Integer> seatList, String eventId) {
+    public void updateSeat(List<List<Integer>> seatList, String eventId) {
         Bucket seatBucket = cluster.bucket(SeatConfig.getStaticBucketName());
         Collection seatCollection = seatBucket.defaultCollection();
 
-        // update seat info from seat bucket
-        for (int i = 0; i < seatList.size(); i++) {
-            String documentId = eventId + "-" + seatList.get(i);
+        int row = seatList.size();
+        int col = seatList.isEmpty() ? 0 : seatList.get(0).size();
 
-            // check if seat already sold out
-            Object seatResult = seatCollection.get(documentId).contentAsObject().get("sold");
-            if (seatResult.equals(false)) {
-                JsonObject jsonData = JsonObject.create()
-                        .put("id", documentId)
-                        .put("sold", true);
-                seatCollection.replace(documentId, jsonData);
+        // update seat info from seat bucket
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                String documentId = eventId + "-" + seatList.get(i) + ":" + seatList.get(j);
+
+                // check if seat already sold out
+                Object seatResult = seatCollection.get(documentId).contentAsObject().get("sold");
+                if (seatResult.equals(false)) {
+                    JsonObject jsonData = JsonObject.create()
+                            .put("id", documentId)
+                            .put("sold", true);
+                    seatCollection.replace(documentId, jsonData);
+                }
             }
         }
     }

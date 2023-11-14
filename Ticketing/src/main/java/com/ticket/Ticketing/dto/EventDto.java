@@ -10,6 +10,7 @@ import lombok.*;
 public class EventDto {
     private String id;
     private String managerId;
-    private Integer seatNum;
+    private Integer row;
+    private Integer col;
     private String eventName;
 }

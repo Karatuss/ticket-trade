@@ -213,7 +213,7 @@ public class PostController {
             Object dataSeat = seatData.get("selectedSeatIds");
             Object eventId = seatData.get("eventId");
 
-            List<Integer> seatList = (List<Integer>) dataSeat;
+            List<List<Integer>> seatList = (List<List<Integer>>) dataSeat;
 
             // user check wrong the number of seats
             if (seatList.isEmpty() || seatList.size() > 2) {
@@ -270,7 +270,7 @@ public class PostController {
 
             // if "remove" is "true", remove all data about eventId
             if (managerData.get("remove") == "true") {
-                eventService.endEvent(seatService, eventId);
+                eventService.removeEvent(seatService, eventId);
             } else {
                 // put event participants list
                 managerData.put("eventParticipantsList", eventService.eventParticipantsList(eventId));
@@ -307,10 +307,11 @@ public class PostController {
                 throw new LoginException();
             }
 
-            Integer seatNum = Integer.parseInt(String.valueOf(managerData.get("row"))) * Integer.parseInt(String.valueOf(managerData.get("col")));
+            Integer row = Integer.parseInt(String.valueOf(managerData.get("row")));
+            Integer col = Integer.parseInt(String.valueOf(managerData.get("col")));
             String eventName = (String) managerData.get("eventName");
 
-            eventService.startEvent(seatService, loginManager, seatNum, eventName);
+            eventService.startEvent(seatService, loginManager, row, col, eventName);
 
             return ResponseEntity.status(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)

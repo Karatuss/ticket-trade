@@ -22,7 +22,10 @@ public class EventDocument {
     String managerId;
 
     @Field
-    Integer seatNum;
+    Integer row;
+
+    @Field
+    Integer col;
 
     @Field
     String eventName;
