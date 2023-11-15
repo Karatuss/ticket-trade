@@ -9,8 +9,10 @@
 <body>
 <h1>이벤트 생성하기</h1>
 <div id="event_generate">
-    이벤트 이름: <input type="text" id="event_name"><br>
-    이벤트 좌석: 행 <input type="number" id="event_seatCol"> 열 <input type="number" id="event_seatRow"><br>
+    이벤트 이름: <label for="event_name"></label><input type="text" id="event_name"><br>
+    이벤트 좌석: <br>
+    <label for="event_seatRow">행 </label><input type="number" id="event_seatRow">
+    <label for="event_seatCol">열 </label><input type="number" id="event_seatCol"> <br>
     <button id="generate">생성하기</button>
     <button id="return" onclick="location.href='manager-event'">되돌아가기</button>
 </div>

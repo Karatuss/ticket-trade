@@ -14,7 +14,26 @@ document.addEventListener('DOMContentLoaded', function () {
     for (const key in EventlistArray) { // json 객채의 key 개수만큼 실행
         AddEventDiv(EventlistArray, key);
     }
+
+
+    document.getElementById("event_remove_button").addEventListener("click", function () {
+        let divElement = document.getElementById('event_remove_div');
+        divElement.style.display = 'block';
+
+        document.getElementById("remove").addEventListener("click", function () {
+            let Event_name = document.getElementById('event_remove').value;
+            for (const key in EventlistArray)
+            {
+                if (Event_name === EventlistArray[key].eventName) {
+                    FetchRemoveEvent(EventlistArray[key].id);
+                    Event_name = "";
+                    divElement.style.display = 'none';
+                }
+            }
+        });
+    });
 });
+
 
 function AddEventDiv(EventList, key) { //서버로 부터 받아 온 정보를 토대로 이벤트명 + div 만드는 함수
     const EventListDiv = document.getElementById('manage_event'); // 'event'라는 id를 가진 요소를 가져옴
@@ -70,7 +89,6 @@ function FetchEventId_manage(ClickDiv) { //특정 이벤트명을 클릭 시 서
         .then(response => response.json()) // 응답을 JSON 형식으로 파싱
         .then((data) => {
 
-            console.log(data);
             if (!data.eventParticipantsList[0]) {
                 alert('이벤트를 예약한 유저가 없습니다.');
             } else {
@@ -100,3 +118,27 @@ function FetchEventId_manage(ClickDiv) { //특정 이벤트명을 클릭 시 서
         .catch(error => console.error('Error', error));
 }
 
+function FetchRemoveEvent(Event_Id){
+
+    const data_manager = {
+        remove: true,
+        eventId: Event_Id
+    };
+
+    // 파일이 JSON형식임을 명시
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const requestOptions = {
+        // POST 요청을 보냄
+        method: 'POST',
+        headers: myHeaders,
+        // data의 정보를 JSON 형식으로 만들어 서버로 전송
+        body: JSON.stringify(data_manager),
+        redirect: 'follow'
+    };
+
+    fetch('http://localhost:8080/manager-event', requestOptions) // 서버에 eventid를 보내고 user-event-seat.html로 이동
+        // 서버로부터 받은 응답을 response에 json 형식으로 파싱 (response는 서버에서 받은 전체 응답을 의미)
+        .then(response => response.json()) // 응답을 JSON 형식으로 파싱
+}

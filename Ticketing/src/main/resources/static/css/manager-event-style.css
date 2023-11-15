@@ -15,6 +15,10 @@ body {
     text-align: center;
 }
 
+#event_remove_div{
+    display: none;
+}
+
 h1 {
     font-size: 36px;
     text-align: center;

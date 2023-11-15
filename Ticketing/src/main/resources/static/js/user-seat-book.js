@@ -1,28 +1,40 @@
 const Event_id_Area = document.querySelector('a[User-Event]');//event-list 로 받아 온 영역 선택
 const All_Seat_List_Area = document.querySelector('a[All-Seat]');//user-event-list 로 받아 온 영역 선택
 const User_Seat_List_Area = document.querySelector('a[User-Seat]');//event-list 로 받아 온 영역 선택
-const Event_Seat_Num_Area = document.querySelector('a[Event-Seat]');//event-list 로 받아 온 영역 선택
+const Event_Seat_row_Area = document.querySelector('a[row]');//event-list 로 받아 온 영역 선택
+const Event_Seat_col_Area = document.querySelector('a[col]');//event-list 로 받아 온 영역 선택
 
 let event_id = parseInt(Event_id_Area.getAttribute('User-Event'));//받아온 영역으로 부터 event-list 의 이름으로 저장 된 정보를 부여
 let All_Seat_List = All_Seat_List_Area.getAttribute('All-Seat');//받아온 영역으로 부터 user-event-list 의 이름으로 저장 된 정보를 부여
 let User_Seat_List = User_Seat_List_Area.getAttribute('User-Seat');//받아온 영역으로 부터 event-list 의 이름으로 저장 된 정보를 부여
-let Event_Seat_Num = parseInt(Event_Seat_Num_Area.getAttribute('Event-Seat'));//받아온 영역으로 부터 event-list 의 이름으로 저장 된 정보를 부여
+let Event_Seat_row = parseInt(Event_Seat_row_Area.getAttribute('row'));//받아온 영역으로 부터 event-list 의 이름으로 저장 된 정보를 부여
+let Event_Seat_col = parseInt(Event_Seat_col_Area.getAttribute('col'));//받아온 영역으로 부터 event-list 의 이름으로 저장 된 정보를 부여
 
+
+const seatPairs_ALL = All_Seat_List.match(/\d+:\d+/g);
+// 각 쌍을 숫자 배열로 변환
+
+const seatListArray_ALL = seatPairs_ALL ? seatPairs_ALL.map(pair => {
+    const [row, col] = pair.split(':').map(Number);
+    return [(row - 1) * Event_Seat_col + col];
+}) : [];
+
+const seatPairs_USER = User_Seat_List.match(/\d+:\d+/g);
+// 각 쌍을 숫자 배열로 변환
+const seatListArray_USER = seatPairs_USER ? seatPairs_USER.map(pair => {
+    const [row, col] = pair.split(':').map(Number);
+    return [(row - 1) * Event_Seat_col + col];
+}) : [];
 
 let seats = [];
-let rows = 5;
 let selectedSeats = [];
-let seatsPerRow = parseInt(Event_Seat_Num / rows);
 
 document.addEventListener("DOMContentLoaded", function () {
 
-
-    if (Event_Seat_Num - rows * seatsPerRow != null)
-        rows += 1;
-    for (let i = 1; i <= rows; i++) {
-        for (let j = 1; j <= seatsPerRow; j++) {
-            let seat_id = (i - 1) * seatsPerRow + j;
-            seats.push({id: seat_id.toString().padStart(3, '0'), reservedBy: ''});
+    for (let i = 1; i <= Event_Seat_col; i++) {
+        for (let j = 1; j <= Event_Seat_row; j++) {
+            let seat_id = (i - 1) * Event_Seat_row + j;
+            seats.push({id: seat_id, reservedBy: ''});
         }
     }
 
@@ -32,24 +44,25 @@ document.addEventListener("DOMContentLoaded", function () {
     */
 
     const seatingPlanElement = document.getElementById('seatingPlan');
-    for (let i = 0; i < seats.length; i += seatsPerRow) {
-        const seatingRow = document.createElement('div');
-        seatingRow.classList.add('seating-row');
-        seats.slice(i, i + seatsPerRow).forEach(seat => {
+    for (let i = 0; i < seats.length; i += Event_Seat_col) {
+        const seatingCol = document.createElement('div');
+        seatingCol.classList.add('seating-col');
+        seats.slice(i, i + Event_Seat_col).forEach(seat => {
             const seatElement = createSeatElement(seat); // seatElement는 seat 좌석의 div을 가리킨다.
-            seatingRow.appendChild(seatElement);
+            seatingCol.appendChild(seatElement);
 
-            if (All_Seat_List.includes(seat.id)) { //AllUserSeatArray에 있는 숫자가 내가 생성하고 있는 seat의 id와 일치하다면 실행
+            if (seatListArray_ALL.flat().includes(seat.id)) { //AllUserSeatArray에 있는 숫자가 내가 생성하고 있는 seat의 id와 일치하다면 실행
 
-                if (User_Seat_List.includes(seat.id)) {
+                if (seatListArray_USER.flat().includes(seat.id)) {
                     seat.reservedBy = 'self';
                     selectedSeats.push(seat);
-                } else seat.reservedBy = 'other';
+                } else
+                    seat.reservedBy = 'other';
 
                 seatElement.classList.add('reserved');
             }
         });
-        seatingPlanElement.appendChild(seatingRow);
+        seatingPlanElement.appendChild(seatingCol);
     }
     updateReservedSeatsText();
 
@@ -86,12 +99,15 @@ function toggleSeat(seat) {
 
 function bookSelectedSeats() {
 
+    let SelectId = [];
+
+    for (let i = 0; i < selectedSeats.length; i++) {
+        SelectId.push((Math.floor((selectedSeats[i].id - 1) / Event_Seat_col) + 1).toString().padStart(3, '0') + ':' + (((selectedSeats[i].id - 1) % Event_Seat_col) + 1).toString().padStart(3, '0'));
+    }
 
     if (selectedSeats.length > 0) {
-        const selectedSeatIds = selectedSeats.map(seat => seat.id);
-
         const data_book = {
-            selectedSeatIds: selectedSeatIds,
+            selectedSeatIds: SelectId,
             eventId: event_id
         };
 
@@ -105,19 +121,19 @@ function bookSelectedSeats() {
             body: JSON.stringify(data_book)
         })
             .then(response => response.json())
-            .then(() => {
-                // if (data.success) {
-                // 성공적으로 예약되었을 때 처리
-                selectedSeats.forEach(seat => {
-                    seat.reservedBy = 'self'; // 예약자를 'self'로 설정
-                    const seatElement = document.querySelector(`[data-seat-id="${seat.id}"]`);
-                    seatElement.classList.remove('selected');
-                    seatElement.classList.add('reserved');
-                });
+            .then((data) => {
+                if (data.success) {
+                    // 성공적으로 예약되었을 때 처리
+                    selectedSeats.forEach(seat => {
+                        seat.reservedBy = 'self'; // 예약자를 'self'로 설정
+                        const seatElement = document.querySelector(`[data-seat-id="${seat.id}"]`);
+                        seatElement.classList.remove('selected');
+                        seatElement.classList.add('reserved');
+                    });
 
-                // } else {
-                //     alert('다시 시도해 주세요.');
-                // }
+                } else {
+                    alert('다시 시도해 주세요.');
+                }
 
                 updateReservedSeatsText();
             })
