@@ -21,7 +21,7 @@ import static com.ticket.Ticketing.Ticketing.cluster;
 @Service
 public class EventService {
 
-    public void startEvent(SeatService seatService, String loginManager, Integer seatNum, String eventName) {
+    public void startEvent(SeatService seatService, String loginManager, Integer row, Integer col, String eventName) {
         // access to bucket
         Bucket eventBucket = cluster.bucket(EventConfig.getStaticBucketName());
         Collection eventCollection = eventBucket.defaultCollection();
@@ -35,26 +35,28 @@ public class EventService {
         JsonObject jsonData = JsonObject.create()
                 .put("id", eventNum)
                 .put("managerId", loginManager)
-                .put("seatNum", seatNum)
+                .put("row", row)
+                .put("col", col)
                 .put("eventName", eventName);
 
         // create new event on event_bucket by only manager
         eventCollection.insert(String.valueOf(eventNum), jsonData);
 
         // create seat by event
-        seatService.createSeatDocuments(String.valueOf(eventNum), seatNum);
+        seatService.createSeatDocuments(String.valueOf(eventNum), row, col);
     }
 
-    public void endEvent(SeatService seatService, String eventId) {
+    public void removeEvent(SeatService seatService, String eventId) {
         // access to bucket
         Bucket eventBucket = cluster.bucket(EventConfig.getStaticBucketName());
         Collection eventCollection = eventBucket.defaultCollection();
 
         JsonObject content = eventCollection.get(eventId).contentAsObject();
-        int seatNum = (int) content.get("seatNum");
+        int row = (int) content.get("row");
+        int col = (int) content.get("col");
 
         // delete seat by event
-        seatService.deleteSeatByEventDocuments(eventId, seatNum);
+        seatService.deleteSeatByEventDocuments(eventId, row, col);
 
         // delete event on event_bucket by only manager
         eventCollection.remove(eventId);
@@ -127,32 +129,22 @@ public class EventService {
 
         List<String> stringList = new ArrayList<>();
 
-        try {
-            // create primary index
-            cluster.query("CREATE PRIMARY INDEX ON `" + UserConfig.getStaticBucketName() + "`", QueryOptions.queryOptions());
+        String query = "SELECT * FROM " + "`" + UserConfig.getStaticBucketName() + "` WHERE id";
+        QueryResult result = cluster.query(query, QueryOptions.queryOptions());
 
-            // TODO: 동기 혹은 비동기 처리
-//            // wait for available status
-//            userBucket.waitUntilReady(Duration.ofSeconds(2));
-
-            // get all keys from every documents by using N1QL query
-            String query = "SELECT RAW META().id FROM `" + UserConfig.getStaticBucketName() + "`";
-            QueryResult result = cluster.query(query, QueryOptions.queryOptions());
-
-            List<String> keys = result.rowsAs(String.class);
-
-            for (String key : keys) {
-                JsonObject content = userCollection.get(key).contentAsObject();
-                String event = String.valueOf(content.getArray("seat").getString(0)).split("-")[0];
+        for (int i = 0; i < result.rowsAsObject().size(); i++) {
+            Object seat = result.rowsAsObject().get(i).getObject("user_bucket").getArray("seat").get(0);
+            if (seat != null) {
+                String event = seat.toString().split("-")[0];
                 if (event.equals(eventId)) {
+                    String userID = String.valueOf(result.rowsAsObject().get(i).getObject("user_bucket").get("id"));
+                    JsonObject content = userCollection.get(userID).contentAsObject();
                     String userId = String.valueOf(content.get("id"));
                     stringList.add(String.valueOf(userCollection.get(userId).contentAsObject()));
                 }
             }
-        } finally {
-            // delete primary index
-            cluster.query("DROP INDEX `" + UserConfig.getStaticBucketName() + "`.`#primary`", QueryOptions.queryOptions());
         }
+        
         return stringList;
     }
 

@@ -4,6 +4,7 @@ import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Collection;
 import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.kv.ExistsResult;
+import com.couchbase.client.java.query.QueryOptions;
 import com.ticket.Ticketing.config.UserConfig;
 import com.ticket.Ticketing.domain.repository.Gender;
 import com.ticket.Ticketing.domain.repository.Role;
@@ -28,16 +29,21 @@ public class UserService {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    public void updateUser(String loginUser, List<Integer> seatList, String eventId) {
+    public void updateUser(String loginUser, List<List<Integer>> seatList, String eventId) {
         Bucket userBucket = cluster.bucket(UserConfig.getStaticBucketName());
         Collection userCollection = userBucket.defaultCollection();
 
         List<String> seatStringList = new ArrayList<>();
 
+        int row = seatList.size();
+        int col = seatList.isEmpty() ? 0 : seatList.get(0).size();
+
         // format seatList
-        for (int i = 0; i < seatList.size(); i++) {
-            String seatInfo = eventId + "-" + seatList.get(i);
-            seatStringList.add(seatInfo);
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                String seatInfo = eventId + "-" + seatList.get(i) + ":" + seatList.get(j);
+                seatStringList.add(seatInfo);
+            }
         }
 
         // update seat info from user bucket
@@ -84,6 +90,10 @@ public class UserService {
 
         // insert data
         userCollection.insert(n_ID, jsonData);
+
+        // create index on the basis of id
+        String query = "CREATE INDEX user_idx ON " + "`" + UserConfig.getStaticBucketName() + "` (id)";
+        cluster.query(query, QueryOptions.queryOptions());
     }
 
 }
