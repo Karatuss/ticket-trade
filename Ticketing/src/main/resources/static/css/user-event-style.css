@@ -40,6 +40,7 @@ h1 {
     flex-direction: row; /* 가로 방향으로 나열 */
     justify-content: space-between; /* 좌우로 공간 배분 */
     align-items: center; /* 수직 중앙 정렬 */
+    text-align: center;
 }
 
 #event h2 {

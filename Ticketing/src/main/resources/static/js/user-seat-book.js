@@ -10,13 +10,15 @@ let Event_Seat_Num = parseInt(Event_Seat_Num_Area.getAttribute('Event-Seat'));//
 
 
 let seats = [];
-const rows = 5;
+let rows = 5;
 let selectedSeats = [];
-let seatsPerRow = Event_Seat_Num / rows;
+let seatsPerRow = parseInt(Event_Seat_Num / rows);
 
 document.addEventListener("DOMContentLoaded", function () {
 
 
+    if (Event_Seat_Num - rows * seatsPerRow != null)
+        rows += 1;
     for (let i = 1; i <= rows; i++) {
         for (let j = 1; j <= seatsPerRow; j++) {
             let seat_id = (i - 1) * seatsPerRow + j;
