@@ -70,31 +70,31 @@ function FetchEventId_manage(ClickDiv) { //특정 이벤트명을 클릭 시 서
         .then(response => response.json()) // 응답을 JSON 형식으로 파싱
         .then((data) => {
 
-            console.log(data.eventParticipantsList[0]);
+            console.log(data);
+            if (!data.eventParticipantsList[0]) {
+                alert('이벤트를 예약한 유저가 없습니다.');
+            } else {
 
-            // 자식 div가 존재하지 않는다면 생성
-            const childDiv = document.createElement("div");
-            childDiv.id = "childDiv";
-            for (let j = 0; j < data.eventParticipantsList.length; j++) {
-                // Initialize the array if not already defined
-                let list = JSON.parse(data.eventParticipantsList[j]);
+                const childDiv = document.createElement("div");
+                childDiv.id = "childDiv";
+                for (let j = 0; j < data.eventParticipantsList.length; j++) {
+                    // Initialize the array if not already defined
+                    let list = JSON.parse(data.eventParticipantsList[j]);
 
-                console.log(list.gender);
+                    let list_seatId = "";
+                    for (let i = 0; i < list.seat.length; i++) {
+                        if (list.seat[i])
+                            if (list_seatId)
+                                list_seatId += ', ' + parseInt(list.seat[i].match(/\d{3}$/), 10);
+                            else
+                                list_seatId = parseInt(list.seat[i].match(/\d{3}$/), 10);
+                    }
 
-                let list_seatId = "";
-                for (let i = 0; i < list.seat.length; i++) {
-                    if (list.seat[i])
-                        if (list_seatId)
-                            list_seatId += ', ' + parseInt(list.seat[i].match(/\d{3}$/), 10);
-                        else
-                            list_seatId = parseInt(list.seat[i].match(/\d{3}$/), 10);
+                    childDiv.innerHTML += `Seat Number: ${list_seatId} <br>ID: ${list.id}, Phone Number: ${list.phoneNumber} <br>`;
                 }
 
-                childDiv.innerHTML += `ID: ${list.id}, Username: ${list.name}, Age: ${list.age}, E-mail: ${list.email},
-                 Gender: ${list.gender}, Phone Number: ${list.phoneNumber}, Seat ID: ${list_seatId}<br>`;
+                ClickDiv.appendChild(childDiv);
             }
-
-            ClickDiv.appendChild(childDiv);
 
         })
         .catch(error => console.error('Error', error));
