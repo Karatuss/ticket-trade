@@ -18,8 +18,8 @@ warnln "2. Let the network up again with creating a channel applying CA."
 
 
 warnln "3. Deploy the chaincode with Docker."
-. network.sh deployCC -c ticket-channel -ccn chaincode -ccp ../chaincode-go/ -ccl go      # No init function version
-# . network.sh deployCC -c ticket-channel -ccn chaincode -ccp ../chaincode-go/ -ccl go -cci InitLedger
+. network.sh deployCC -c mychannel -ccn basic -ccp ../chaincode-go/ -ccl go      # No init function version
+# . network.sh deployCC -c mychannel -ccn basic -ccp ../chaincode-go/ -ccl go -cci InitLedger
 
 
 warnln "4. Check invoke and query work normally."
