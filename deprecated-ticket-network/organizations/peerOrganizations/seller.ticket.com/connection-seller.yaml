@@ -1,0 +1,63 @@
+---
+name: ticket-network-Seller
+version: 1.0.0
+client:
+  organization: SellerOrg
+  connection:
+    timeout:
+      peer:
+        endorser: '300'
+organizations:
+  SellerOrg:
+    mspid: SellerMSP
+    peers:
+    - peer0.Seller.ticket.com
+    certificateAuthorities:
+    - ca.Seller.ticket.com
+peers:
+  peer0.Seller.ticket.com:
+    url: grpcs://localhost:7051
+    tlsCACerts:
+      pem: |
+          -----BEGIN CERTIFICATE-----
+          MIICFzCCAb2gAwIBAgIUPCeAMjA5/SzUyD6mJawNd16kHykwCgYIKoZIzj0EAwIw
+          aDELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQK
+          EwtIeXBlcmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMt
+          Y2Etc2VydmVyMB4XDTIzMTExNjAxNDYwMFoXDTM4MTExMjAxNDYwMFowaDELMAkG
+          A1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQKEwtIeXBl
+          cmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMtY2Etc2Vy
+          dmVyMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEmHGAYbV9S7Q4Wt1dTaRGOqcT
+          aAKYbAnWzCf2b7bKR0PojI4AjE3NunXrtzHd/8edizNbgZoK/P46e0/zXDFdrKNF
+          MEMwDgYDVR0PAQH/BAQDAgEGMBIGA1UdEwEB/wQIMAYBAf8CAQEwHQYDVR0OBBYE
+          FLbWdP0HODvAfZ0LYPSBOCtDsigPMAoGCCqGSM49BAMCA0gAMEUCIQCOMKPdq4cw
+          vRmpv2QNN2h1bka39MrhPCCp2tvK5G5RYgIgf8WAAdyvh4TaxNqSYJaVnyUdxoq5
+          O8HRg/Lf1hMcUBM=
+          -----END CERTIFICATE-----
+          
+    grpcOptions:
+      ssl-target-name-override: peer0.Seller.ticket.com
+      hostnameOverride: peer0.Seller.ticket.com
+certificateAuthorities:
+  ca.Seller.ticket.com:
+    url: https://localhost:7054
+    caName: ca-Seller
+    tlsCACerts:
+      pem: 
+        - |
+          -----BEGIN CERTIFICATE-----
+          MIICFzCCAb2gAwIBAgIUPCeAMjA5/SzUyD6mJawNd16kHykwCgYIKoZIzj0EAwIw
+          aDELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQK
+          EwtIeXBlcmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMt
+          Y2Etc2VydmVyMB4XDTIzMTExNjAxNDYwMFoXDTM4MTExMjAxNDYwMFowaDELMAkG
+          A1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQKEwtIeXBl
+          cmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMtY2Etc2Vy
+          dmVyMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEmHGAYbV9S7Q4Wt1dTaRGOqcT
+          aAKYbAnWzCf2b7bKR0PojI4AjE3NunXrtzHd/8edizNbgZoK/P46e0/zXDFdrKNF
+          MEMwDgYDVR0PAQH/BAQDAgEGMBIGA1UdEwEB/wQIMAYBAf8CAQEwHQYDVR0OBBYE
+          FLbWdP0HODvAfZ0LYPSBOCtDsigPMAoGCCqGSM49BAMCA0gAMEUCIQCOMKPdq4cw
+          vRmpv2QNN2h1bka39MrhPCCp2tvK5G5RYgIgf8WAAdyvh4TaxNqSYJaVnyUdxoq5
+          O8HRg/Lf1hMcUBM=
+          -----END CERTIFICATE-----
+          
+    httpOptions:
+      verify: false
