@@ -23,7 +23,7 @@ import static com.ticket.Ticketing.Ticketing.cluster;
 public class EventService {
 
     public void startEvent(SeatService seatService, String loginManager, Integer row, Integer col
-            , String eventName, LocalDateTime eventStart, LocalDateTime eventEnd) {
+            , String eventName, String eventStart, String eventEnd) {
         // access to bucket
         Bucket eventBucket = cluster.bucket(EventConfig.getStaticBucketName());
         Collection eventCollection = eventBucket.defaultCollection();
@@ -42,7 +42,7 @@ public class EventService {
                 .put("eventName", eventName)
                 .put("eventStart", eventStart)
                 .put("eventEnd", eventEnd)
-                .put("eventStatus", isEventAccessible(String.valueOf(eventNum)));
+                .put("eventStatus", false);
 
         // create new event on event_bucket by only manager
         eventCollection.insert(String.valueOf(eventNum), jsonData);
@@ -125,9 +125,7 @@ public class EventService {
         for (int i = 1; i < eventNum; i++) {
             JsonObject event = eventCollection.get(String.valueOf(i)).contentAsObject();
             if (event.getString("managerId").equals(loginManager)) {
-                if (isEventAccessible(event.getString("id"))) {
-                    eventList.put(String.valueOf(i), String.valueOf(event));
-                }
+                eventList.put(String.valueOf(i), String.valueOf(event));
             }
         }
 
@@ -177,16 +175,17 @@ public class EventService {
 
         JsonObject eventObject = eventCollection.get(eventId).contentAsObject();
 
-        LocalDateTime eventStart = (LocalDateTime) eventObject.get("eventStart");
-        LocalDateTime eventEnd = (LocalDateTime) eventObject.get("eventEnd");
+        LocalDateTime eventStart = LocalDateTime.parse(String.valueOf(eventObject.get("eventStart")));
 
-        if (currentTime.isAfter(eventStart) && currentTime.isBefore(eventEnd)) {
+
+        if (currentTime.isBefore(eventStart)) {
             eventCollection.get(eventId).contentAsObject().put("eventStatus", true);
             return true;
         } else {
             eventCollection.get(eventId).contentAsObject().put("eventStatus", false);
             return false;
         }
+
     }
 
 }

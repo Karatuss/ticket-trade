@@ -7,6 +7,7 @@ import com.couchbase.client.java.json.JsonArray;
 import com.couchbase.client.java.json.JsonObject;
 import com.ticket.Ticketing.config.UserConfig;
 import com.ticket.Ticketing.domain.repository.SessionConst;
+import com.ticket.Ticketing.service.BlockChainService;
 import com.ticket.Ticketing.service.EventService;
 import com.ticket.Ticketing.service.SeatService;
 import com.ticket.Ticketing.service.UserService;
@@ -22,7 +23,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.security.auth.login.LoginException;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 
@@ -43,6 +43,7 @@ public class PostController {
     private final EventService eventService;
     private final SeatService seatService;
     private final UserService userService;
+    private final BlockChainService blockChainService;
 
     // REGISTER
     @PostMapping(value = "/register")
@@ -280,6 +281,9 @@ public class PostController {
             // get event id from manager data
             String eventId = String.valueOf(managerData.get("eventId"));
 
+            // check whether modify ticket info
+            blockChainService.checkTicketModified(eventId);
+
             // if "remove" is "true", remove all data about eventId
             if (managerData.get("remove").equals(true)) {
                 eventService.removeEvent(seatService, eventId);
@@ -322,8 +326,8 @@ public class PostController {
             Integer row = Integer.parseInt(String.valueOf(managerData.get("row")));
             Integer col = Integer.parseInt(String.valueOf(managerData.get("col")));
             String eventName = (String) managerData.get("eventName");
-            LocalDateTime eventStart = (LocalDateTime) managerData.get("eventStart");
-            LocalDateTime eventEnd = (LocalDateTime) managerData.get("eventEnd");
+            String eventStart = String.valueOf(managerData.get("eventStart"));
+            String eventEnd = String.valueOf(managerData.get("eventEnd"));
 
             eventService.startEvent(seatService, loginManager, row, col, eventName, eventStart, eventEnd);
 
