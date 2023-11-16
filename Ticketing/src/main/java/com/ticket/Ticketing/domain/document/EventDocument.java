@@ -9,6 +9,8 @@ import org.springframework.data.couchbase.core.mapping.Field;
 import org.springframework.data.couchbase.core.mapping.id.GeneratedValue;
 import org.springframework.data.couchbase.core.mapping.id.GenerationStrategy;
 
+import java.time.LocalDateTime;
+
 @Builder
 @Data
 @AllArgsConstructor
@@ -29,4 +31,13 @@ public class EventDocument {
 
     @Field
     String eventName;
+
+    @Field
+    LocalDateTime eventStart;
+
+    @Field
+    LocalDateTime eventEnd;
+
+    @Field
+    Boolean eventStatus;
 }

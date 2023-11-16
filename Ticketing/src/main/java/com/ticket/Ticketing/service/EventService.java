@@ -11,6 +11,7 @@ import com.ticket.Ticketing.config.EventConfig;
 import com.ticket.Ticketing.config.UserConfig;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +22,8 @@ import static com.ticket.Ticketing.Ticketing.cluster;
 @Service
 public class EventService {
 
-    public void startEvent(SeatService seatService, String loginManager, Integer row, Integer col, String eventName) {
+    public void startEvent(SeatService seatService, String loginManager, Integer row, Integer col
+            , String eventName, LocalDateTime eventStart, LocalDateTime eventEnd) {
         // access to bucket
         Bucket eventBucket = cluster.bucket(EventConfig.getStaticBucketName());
         Collection eventCollection = eventBucket.defaultCollection();
@@ -37,7 +39,10 @@ public class EventService {
                 .put("managerId", loginManager)
                 .put("row", row)
                 .put("col", col)
-                .put("eventName", eventName);
+                .put("eventName", eventName)
+                .put("eventStart", eventStart)
+                .put("eventEnd", eventEnd)
+                .put("eventStatus", isEventAccessible(String.valueOf(eventNum)));
 
         // create new event on event_bucket by only manager
         eventCollection.insert(String.valueOf(eventNum), jsonData);
@@ -82,7 +87,9 @@ public class EventService {
         // return whole event list
         if (loginUser == null) {
             for (int i = 1; i < eventNum; i++) {
-                eventList.put(String.valueOf(i), eventCollection.get(String.valueOf(i)).contentAsObject());
+                if (isEventAccessible(String.valueOf(i))) {
+                    eventList.put(String.valueOf(i), eventCollection.get(String.valueOf(i)).contentAsObject());
+                }
             }
         } else {
             // return event list that login user is participating in
@@ -91,7 +98,9 @@ public class EventService {
             for (int i = 0; i < seatData.size(); i++) {
                 String eventId = String.valueOf(seatData.get(i)).split("-")[0];
                 if ((!eventId.equals("null")) && !eventId.isEmpty()) {
-                    eventList.put(eventId, eventCollection.get(eventId).contentAsObject());
+                    if (isEventAccessible(eventId)) {
+                        eventList.put(eventId, eventCollection.get(eventId).contentAsObject());
+                    }
                 }
             }
         }
@@ -116,7 +125,9 @@ public class EventService {
         for (int i = 1; i < eventNum; i++) {
             JsonObject event = eventCollection.get(String.valueOf(i)).contentAsObject();
             if (event.getString("managerId").equals(loginManager)) {
-                eventList.put(String.valueOf(i), String.valueOf(event));
+                if (isEventAccessible(event.getString("id"))) {
+                    eventList.put(String.valueOf(i), String.valueOf(event));
+                }
             }
         }
 
@@ -144,7 +155,7 @@ public class EventService {
                 }
             }
         }
-        
+
         return stringList;
     }
 
@@ -154,6 +165,27 @@ public class EventService {
             return true; // event exists
         } catch (DocumentNotFoundException e) {
             return false; // event not exists
+        }
+    }
+
+    private boolean isEventAccessible(String eventId) {
+
+        Bucket eventBucket = cluster.bucket(EventConfig.getStaticBucketName());
+        Collection eventCollection = eventBucket.defaultCollection();
+
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        JsonObject eventObject = eventCollection.get(eventId).contentAsObject();
+
+        LocalDateTime eventStart = (LocalDateTime) eventObject.get("eventStart");
+        LocalDateTime eventEnd = (LocalDateTime) eventObject.get("eventEnd");
+
+        if (currentTime.isAfter(eventStart) && currentTime.isBefore(eventEnd)) {
+            eventCollection.get(eventId).contentAsObject().put("eventStatus", true);
+            return true;
+        } else {
+            eventCollection.get(eventId).contentAsObject().put("eventStatus", false);
+            return false;
         }
     }
 

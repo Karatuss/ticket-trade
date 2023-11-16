@@ -21,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.security.auth.login.LoginException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 
@@ -197,6 +198,9 @@ public class PostController {
                                        HttpServletRequest request) {
 
         try {
+            Bucket userBucket = cluster.bucket(UserConfig.getStaticBucketName());
+            Collection userCollection = userBucket.defaultCollection();
+
             // get session
             HttpSession session = request.getSession(false);
 
@@ -217,6 +221,12 @@ public class PostController {
 
             // user check wrong the number of seats
             if (seatList.isEmpty() || seatList.size() > 2) {
+                seatData.put("success", false);
+                throw new IllegalArgumentException();
+            }
+
+            // check user can't book tickets more
+            if (userCollection.get(loginUser).contentAsObject().getArray("seat").size() == 2) {
                 seatData.put("success", false);
                 throw new IllegalArgumentException();
             }
@@ -266,10 +276,10 @@ public class PostController {
             }
 
             // get event id from manager data
-            String eventId = (String) managerData.get("eventId");
+            String eventId = String.valueOf(managerData.get("eventId"));
 
             // if "remove" is "true", remove all data about eventId
-            if (managerData.get("remove") == "true") {
+            if (managerData.get("remove").equals(true)) {
                 eventService.removeEvent(seatService, eventId);
             } else {
                 // put event participants list
@@ -310,8 +320,10 @@ public class PostController {
             Integer row = Integer.parseInt(String.valueOf(managerData.get("row")));
             Integer col = Integer.parseInt(String.valueOf(managerData.get("col")));
             String eventName = (String) managerData.get("eventName");
+            LocalDateTime eventStart = (LocalDateTime) managerData.get("eventStart");
+            LocalDateTime eventEnd = (LocalDateTime) managerData.get("eventEnd");
 
-            eventService.startEvent(seatService, loginManager, row, col, eventName);
+            eventService.startEvent(seatService, loginManager, row, col, eventName, eventStart, eventEnd);
 
             return ResponseEntity.status(HttpStatus.OK)
                     .contentType(MediaType.APPLICATION_JSON)
