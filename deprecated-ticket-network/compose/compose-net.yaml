@@ -1,0 +1,184 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: '3.7'
+
+volumes:
+  orderer.ticket.com:
+  peer0.seller.ticket.com:
+  peer0.buyer.ticket.com:
+
+networks:
+  ticket:
+
+services:
+
+  orderer.ticket.com:
+    container_name: orderer.ticket.com
+    image: hyperledger/fabric-orderer:2.5
+    labels:
+      service: hyperledger-fabric
+    environment:
+      - FABRIC_LOGGING_SPEC=INFO
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_LISTENPORT=7050
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+      # enabled TLS
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_GENERAL_BOOTSTRAPMETHOD=none
+      - ORDERER_CHANNELPARTICIPATION_ENABLED=true
+      - ORDERER_ADMIN_TLS_ENABLED=true
+      - ORDERER_ADMIN_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_ADMIN_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_ADMIN_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_ADMIN_TLS_CLIENTROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_ADMIN_LISTENADDRESS=0.0.0.0:7053
+      - ORDERER_OPERATIONS_LISTENADDRESS=orderer.ticket.com:9443
+      - ORDERER_METRICS_PROVIDER=prometheus
+      # CA variables
+      - ORDERER_CA=/var/hyperledger/orderer/tlsca/tlsca.ticket.com-cert.pem
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric_ticket
+    working_dir: /root
+    command: orderer
+    volumes:
+        - ../organizations/ordererOrganizations/ticket.com/orderers/orderer.ticket.com/msp:/var/hyperledger/orderer/msp
+        - ../organizations/ordererOrganizations/ticket.com/orderers/orderer.ticket.com/tls:/var/hyperledger/orderer/tls
+        - ../organizations/ordererOrganizations/ticket.com/orderers/orderer.ticket.com/tlsca:/var/hyperledger/orderer/tlsca
+        - orderer.ticket.com:/var/hyperledger/production/orderer
+        - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 7050:7050
+      - 7053:7053
+      - 9443:9443
+    networks:
+      - ticket
+
+  peer0.seller.ticket.com:
+    container_name: peer0.seller.ticket.com
+    image: hyperledger/fabric-peer:2.5
+    labels:
+      service: hyperledger-fabric
+    environment:
+      - FABRIC_CFG_PATH=/etc/hyperledger/peercfg
+      - FABRIC_LOGGING_SPEC=INFO
+      #- FABRIC_LOGGING_SPEC=DEBUG
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_PROFILE_ENABLED=false
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      # - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt # tlsca가 없을 때, 즉 -ca 옵션 없을 때 사용!
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tlsca/tlsca.seller.ticket.com-cert.pem
+      # Peer specific variables
+      - CORE_PEER_ID=peer0.seller.ticket.com
+      - CORE_PEER_ADDRESS=peer0.seller.ticket.com:7051  # localhost:7051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.seller.ticket.com:7052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.seller.ticket.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.seller.ticket.com:7051
+      - CORE_PEER_LOCALMSPID=SellerMSP
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      # - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/users/Admin@seller.ticket.com/msp
+      - CORE_OPERATIONS_LISTENADDRESS=peer0.seller.ticket.com:9444
+      - CORE_METRICS_PROVIDER=prometheus
+      - CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG={"peername":"peer0seller"}
+      - CORE_CHAINCODE_EXECUTETIMEOUT=300s
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric_ticket
+    volumes:
+      # - ../organizations/peerOrganizations/seller.ticket.com/peers/peer0.seller.ticket.com/msp:/etc/hyperledger/fabric/msp
+      - ../organizations/peerOrganizations/seller.ticket.com/users/Admin@seller.ticket.com/msp:/etc/hyperledger/fabric/msp
+      - ../organizations/peerOrganizations/seller.ticket.com/peers/peer0.seller.ticket.com/tls:/etc/hyperledger/fabric/tls
+      # - ../organizations/peerOrganizations/seller.ticket.com/users:/etc/hyperledger/fabric/users
+      - ../organizations/peerOrganizations/seller.ticket.com/tlsca:/etc/hyperledger/fabric/tlsca
+      - ./docker/peercfg:/etc/hyperledger/peercfg
+      - peer0.seller.ticket.com:/var/hyperledger/production
+      - /var/run/docker.sock:/var/run/docker.sock
+    working_dir: /root
+    command: peer node start
+    ports:
+      - 7051:7051
+      - 9444:9444
+    networks:
+      - ticket
+
+  peer0.buyer.ticket.com:
+    container_name: peer0.buyer.ticket.com
+    image: hyperledger/fabric-peer:2.5
+    labels:
+      service: hyperledger-fabric
+    environment:
+      - FABRIC_CFG_PATH=/etc/hyperledger/peercfg
+      - FABRIC_LOGGING_SPEC=INFO
+      #- FABRIC_LOGGING_SPEC=DEBUG
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_PROFILE_ENABLED=false
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      # - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt # tlsca가 없을 때, 즉 -ca 옵션 없을 때 사용!
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tlsca/tlsca.buyer.ticket.com-cert.pem
+      # Peer specific variables
+      - CORE_PEER_ID=peer0.buyer.ticket.com
+      - CORE_PEER_ADDRESS=peer0.buyer.ticket.com:9051  # localhost:7051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:9051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.buyer.ticket.com:9052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:9052
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.buyer.ticket.com:9051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.buyer.ticket.com:9051
+      - CORE_PEER_LOCALMSPID=BuyerMSP
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      # - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/users/Admin@buyer.ticket.com/msp
+      - CORE_OPERATIONS_LISTENADDRESS=peer0.buyer.ticket.com:9445
+      - CORE_METRICS_PROVIDER=prometheus
+      - CHAINCODE_AS_A_SERVICE_BUILDER_CONFIG={"peername":"peer0buyer"}
+      - CORE_CHAINCODE_EXECUTETIMEOUT=300s
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric_ticket
+    volumes:
+      # - ../organizations/peerOrganizations/buyer.ticket.com/peers/peer0.buyer.ticket.com/msp:/etc/hyperledger/fabric/msp
+      - ../organizations/peerOrganizations/buyer.ticket.com/users/Admin@buyer.ticket.com/msp:/etc/hyperledger/fabric/msp
+      - ../organizations/peerOrganizations/buyer.ticket.com/peers/peer0.buyer.ticket.com/tls:/etc/hyperledger/fabric/tls
+      - ../organizations/peerOrganizations/buyer.ticket.com/users:/etc/hyperledger/fabric/users
+      - ../organizations/peerOrganizations/buyer.ticket.com/tlsca:/etc/hyperledger/fabric/tlsca
+      - ./docker/peercfg:/etc/hyperledger/peercfg
+      - peer0.buyer.ticket.com:/var/hyperledger/production
+      - /var/run/docker.sock:/var/run/docker.sock
+    working_dir: /root
+    command: peer node start
+    ports:
+      - 9051:9051
+      - 9445:9445
+    networks:
+      - ticket
+
+  cli:
+    container_name: cli
+    image: hyperledger/fabric-tools:latest
+    labels:
+      service: hyperledger-fabric
+    tty: true
+    stdin_open: true
+    environment:
+      - GOPATH=/opt/gopath  # hmmm...
+      - FABRIC_LOGGING_SPEC=INFO
+      - FABRIC_CFG_PATH=/etc/hyperledger/peercfg
+      #- FABRIC_LOGGING_SPEC=DEBUG
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash
+    volumes:
+      - ../organizations:/opt/gopath/src/github.com/hyperledger/fabric/peer/organizations   # hmmmmmmmmmm....
+      - ../scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
+      - ./docker/peercfg:/etc/hyperledger/peercfg
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - peer0.seller.ticket.com
+      - peer0.buyer.ticket.com
+    networks:
+      - ticket

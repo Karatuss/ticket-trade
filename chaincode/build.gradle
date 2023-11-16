@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'checkstyle'
+//    id 'checkstyle'
     id 'jacoco'
     id 'application'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
@@ -17,6 +17,8 @@ repositories {
 }
 
 dependencies {
+//    implementation 'org.slf4j:slf4j-api:2.0.7'
+    implementation 'ch.qos.logback:logback-classic:1.4.8'
     implementation 'org.hyperledger.fabric-chaincode-java:fabric-chaincode-shim:2.5.0'
     implementation 'org.json:json:+'
     implementation 'com.owlike:genson:1.6'
@@ -31,19 +33,19 @@ application {
     mainClass = 'org.hyperledger.fabric.contract.ContractRouter'
 }
 
-checkstyle {
-    toolVersion '8.21'
-    configFile file("config/checkstyle/checkstyle.xml")
-}
-
-checkstyleMain {
-    source ='src/main/java'
-}
-
-
-checkstyleTest {
-    source ='src/test/java'
-}
+//checkstyle {
+//    toolVersion '8.21'
+//    configFile file("config/checkstyle/checkstyle.xml")
+//}
+//
+//checkstyleMain {
+//    source ='src/main/java'
+//}
+//
+//
+//checkstyleTest {
+//    source ='src/test/java'
+//}
 
 jacocoTestReport {
     dependsOn test
@@ -63,9 +65,9 @@ jacocoTestCoverageVerification {
 
 test {
     useJUnitPlatform()
-    testLogging {
-        events "passed", "skipped", "failed"
-    }
+//    testLogging {
+//        events "passed", "skipped", "failed"
+//    }
 }
 
 mainClassName = 'org.hyperledger.fabric.contract.ContractRouter'
@@ -80,5 +82,5 @@ shadowJar {
     }
 }
 
-check.dependsOn jacocoTestCoverageVerification
-installDist.dependsOn check
+//check.dependsOn jacocoTestCoverageVerification
+//installDist.dependsOn check

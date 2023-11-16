@@ -1,0 +1,63 @@
+---
+name: ticket-network-Buyer
+version: 1.0.0
+client:
+  organization: BuyerOrg
+  connection:
+    timeout:
+      peer:
+        endorser: '300'
+organizations:
+  BuyerOrg:
+    mspid: BuyerMSP
+    peers:
+    - peer0.Buyer.ticket.com
+    certificateAuthorities:
+    - ca.Buyer.ticket.com
+peers:
+  peer0.Buyer.ticket.com:
+    url: grpcs://localhost:9051
+    tlsCACerts:
+      pem: |
+          -----BEGIN CERTIFICATE-----
+          MIICFjCCAb2gAwIBAgIUaCaklmEE5yjCjSphjJcn6uzzR6MwCgYIKoZIzj0EAwIw
+          aDELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQK
+          EwtIeXBlcmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMt
+          Y2Etc2VydmVyMB4XDTIzMTExNjAxNDYwMFoXDTM4MTExMjAxNDYwMFowaDELMAkG
+          A1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQKEwtIeXBl
+          cmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMtY2Etc2Vy
+          dmVyMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEYVBwB7hT+mT6Hg9Hm49DYB8n
+          JmSfl11z+m4BUfkO6VpoPRSbXu63++xMgwxDPzDSLycOPJEVhVKjFjVdLZwJBqNF
+          MEMwDgYDVR0PAQH/BAQDAgEGMBIGA1UdEwEB/wQIMAYBAf8CAQEwHQYDVR0OBBYE
+          FF97LVFVXDxC004ETvek3Q81QuWPMAoGCCqGSM49BAMCA0cAMEQCICZx8aUkSZMb
+          Wjnmz2g+3d2Ppy5j8eiptgcHR8CcLSqSAiBRhJ1dVemALSFWN/LLwKFoIFTFooaE
+          Z+Cu9TkcrIZ4JQ==
+          -----END CERTIFICATE-----
+          
+    grpcOptions:
+      ssl-target-name-override: peer0.Buyer.ticket.com
+      hostnameOverride: peer0.Buyer.ticket.com
+certificateAuthorities:
+  ca.Buyer.ticket.com:
+    url: https://localhost:8054
+    caName: ca-Buyer
+    tlsCACerts:
+      pem: 
+        - |
+          -----BEGIN CERTIFICATE-----
+          MIICFjCCAb2gAwIBAgIUaCaklmEE5yjCjSphjJcn6uzzR6MwCgYIKoZIzj0EAwIw
+          aDELMAkGA1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQK
+          EwtIeXBlcmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMt
+          Y2Etc2VydmVyMB4XDTIzMTExNjAxNDYwMFoXDTM4MTExMjAxNDYwMFowaDELMAkG
+          A1UEBhMCVVMxFzAVBgNVBAgTDk5vcnRoIENhcm9saW5hMRQwEgYDVQQKEwtIeXBl
+          cmxlZGdlcjEPMA0GA1UECxMGRmFicmljMRkwFwYDVQQDExBmYWJyaWMtY2Etc2Vy
+          dmVyMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEYVBwB7hT+mT6Hg9Hm49DYB8n
+          JmSfl11z+m4BUfkO6VpoPRSbXu63++xMgwxDPzDSLycOPJEVhVKjFjVdLZwJBqNF
+          MEMwDgYDVR0PAQH/BAQDAgEGMBIGA1UdEwEB/wQIMAYBAf8CAQEwHQYDVR0OBBYE
+          FF97LVFVXDxC004ETvek3Q81QuWPMAoGCCqGSM49BAMCA0cAMEQCICZx8aUkSZMb
+          Wjnmz2g+3d2Ppy5j8eiptgcHR8CcLSqSAiBRhJ1dVemALSFWN/LLwKFoIFTFooaE
+          Z+Cu9TkcrIZ4JQ==
+          -----END CERTIFICATE-----
+          
+    httpOptions:
+      verify: false

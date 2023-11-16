@@ -1,0 +1,1 @@
+Error: endorsement failure during invoke. response: status:500 message:"error in simulation: failed to execute transaction 48faef48e6a5b30d58be098233ae7c098dc009f7b02282c45a5770e62d26ce21: invalid invocation: chaincode 'chaincode' has not been initialized for this version, must call as init first" 

@@ -1,0 +1,10 @@
+# crypto-config-buyer.yaml
+
+PeerOrgs:
+  - Name: Buyer
+    Domain: buyer.ticket.com
+    EnableNodeOUs: false
+    Template:
+      Count: 5
+    Users:
+      Count: 1
