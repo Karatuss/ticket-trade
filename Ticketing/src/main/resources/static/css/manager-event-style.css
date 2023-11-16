@@ -6,13 +6,17 @@ body {
 
 #Event_List {
     max-width: 800px;
-    margin: 0 auto;
+    margin: 30px auto 0;
     padding: 20px;
     background-color: #fff;
     border: 1px solid #ccc;
     border-radius: 30px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin-top: 30px;
+    text-align: center;
+}
+
+#event_remove_div{
+    display: none;
 }
 
 h1 {
@@ -22,9 +26,11 @@ h1 {
 }
 
 .event-list {
-    display: flex;
+    display: grid;
     flex-direction: column;
     align-items: stretch;
+    text-align: center;
+    position: relative;
 }
 
 .event {
@@ -69,19 +75,20 @@ h1 {
     background-color: #0056b3;
 }
 
-#childDiv {
+.event-list #childDiv {
     margin-top: 10px;
     padding: 15px;
     border: 1px solid #ccc;
     border-radius: 10px;
     background-color: #f8f8f8;
     width: 80%;
-    margin-left: auto;
-    margin-right: auto;
+    margin-left: 10%;
+    display: inline-block;
+    top: 10px;
 }
 
-
-#childDiv div {
+.event-list #childDiv div {
+    margin-top: 10px;
     margin-bottom: 10px;
     text-align: left;
     padding: 5px;

@@ -16,12 +16,12 @@ h1 {
     border: 1px solid #ccc;
     border-radius: 30px;
     padding: 40px 20px 20px 20px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 400px;
     height: auto;
 }
 
-.seating-row {
+.seating-col {
     display: flex;
     justify-content: center;
     margin-bottom: 10px;
