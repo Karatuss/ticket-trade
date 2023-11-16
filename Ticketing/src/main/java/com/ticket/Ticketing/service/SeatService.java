@@ -124,22 +124,19 @@ public class SeatService {
         Bucket seatBucket = cluster.bucket(SeatConfig.getStaticBucketName());
         Collection seatCollection = seatBucket.defaultCollection();
 
-        int row = seatList.size();
-        int col = seatList.isEmpty() ? 0 : seatList.get(0).size();
+        int size = seatList.size();
 
         // update seat info from seat bucket
-        for (int i = 0; i < row; i++) {
-            for (int j = 0; j < col; j++) {
-                String documentId = eventId + "-" + seatList.get(i) + ":" + seatList.get(j);
+        for (int i = 0; i < size; i++) {
+            String documentId = eventId + "-" + seatList.get(i);
 
-                // check if seat already sold out
-                Object seatResult = seatCollection.get(documentId).contentAsObject().get("sold");
-                if (seatResult.equals(false)) {
-                    JsonObject jsonData = JsonObject.create()
-                            .put("id", documentId)
-                            .put("sold", true);
-                    seatCollection.replace(documentId, jsonData);
-                }
+            // check if seat already sold out
+            Object seatResult = seatCollection.get(documentId).contentAsObject().get("sold");
+            if (seatResult.equals(false)) {
+                JsonObject jsonData = JsonObject.create()
+                        .put("id", documentId)
+                        .put("sold", true);
+                seatCollection.replace(documentId, jsonData);
             }
         }
     }

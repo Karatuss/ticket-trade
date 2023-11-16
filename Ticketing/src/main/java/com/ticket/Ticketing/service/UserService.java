@@ -35,15 +35,10 @@ public class UserService {
 
         List<String> seatStringList = new ArrayList<>();
 
-        int row = seatList.size();
-        int col = seatList.isEmpty() ? 0 : seatList.get(0).size();
-
-        // format seatList
-        for (int i = 0; i < row; i++) {
-            for (int j = 0; j < col; j++) {
-                String seatInfo = eventId + "-" + seatList.get(i) + ":" + seatList.get(j);
-                seatStringList.add(seatInfo);
-            }
+        int size = seatList.size();
+        for (int i = 0; i < size; i++) {
+            String seatInfo = eventId + "-" + seatList.get(i);
+            seatStringList.add(seatInfo);
         }
 
         // update seat info from user bucket
