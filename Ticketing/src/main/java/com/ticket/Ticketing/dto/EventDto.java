@@ -2,6 +2,8 @@ package com.ticket.Ticketing.dto;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Builder
 @Getter
 @Setter
@@ -13,4 +15,7 @@ public class EventDto {
     private Integer row;
     private Integer col;
     private String eventName;
+    private LocalDateTime eventStart;
+    private LocalDateTime eventEnd;
+    private Boolean eventStatus;
 }
