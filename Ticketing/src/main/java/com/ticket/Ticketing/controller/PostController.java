@@ -3,6 +3,7 @@ package com.ticket.Ticketing.controller;
 import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Collection;
+import com.couchbase.client.java.json.JsonArray;
 import com.couchbase.client.java.json.JsonObject;
 import com.ticket.Ticketing.config.UserConfig;
 import com.ticket.Ticketing.domain.repository.SessionConst;
@@ -226,7 +227,8 @@ public class PostController {
             }
 
             // check user can't book tickets more
-            if (userCollection.get(loginUser).contentAsObject().getArray("seat").size() == 2) {
+            JsonArray loginUserSeat = userCollection.get(loginUser).contentAsObject().getArray("seat");
+            if (loginUserSeat.get(0) != null && loginUserSeat.get(1) != null) {
                 seatData.put("success", false);
                 throw new IllegalArgumentException();
             }
