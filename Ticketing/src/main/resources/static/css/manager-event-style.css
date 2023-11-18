@@ -15,7 +15,7 @@ body {
     text-align: center;
 }
 
-#event_remove_div{
+#event_remove_div {
     display: none;
 }
 
@@ -26,7 +26,7 @@ h1 {
 }
 
 .event-list {
-    display: grid;
+    display: flex;
     flex-direction: column;
     align-items: stretch;
     text-align: center;
@@ -35,30 +35,30 @@ h1 {
 
 .event {
     width: 95%;
-    margin-bottom: 20px;
     padding: 20px;
     background-color: #f8f8f8;
     border-radius: 10px;
     cursor: pointer;
     transition: background-color 0.3s ease;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
+    text-align: center;
 }
 
 .event h2 {
-    font-size: 24px;
-    margin-bottom: 10px;
-    flex: 1;
+    font-size: 30px;
+    margin-bottom: 20px;
 }
 
 .event h4 {
-    margin-top: 0;
     color: #ff5050;
-    margin-left: 10px;
+    width: fit-content;
 }
 
-#logout, #event_generate {
+
+#logout,
+#event_generate {
     display: block;
     margin: 20px auto;
     padding: 12px 24px;
@@ -71,7 +71,9 @@ h1 {
     transition: background-color 0.3s ease;
 }
 
-#logout:hover, .event:hover, #event_generate:hover {
+#logout:hover,
+.event:hover,
+#event_generate:hover {
     background-color: #0056b3;
 }
 
@@ -96,3 +98,57 @@ h1 {
     border-radius: 5px;
     background-color: #fff;
 }
+
+#event_remove_div {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+#event_remove_div label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+#event_remove {
+    padding: 8px;
+    font-size: 16px;
+    width: 200px;
+}
+
+#remove {
+    margin-top: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #ff5050;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#remove:hover {
+    background-color: #e60000;
+}
+
+#event_remove_button {
+    display: block;
+    margin: 20px auto; /* Center the button horizontally */
+    padding: 12px 24px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: #fff;
+    border: 2px solid #007bff;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#event_remove_button:hover {
+    background-color: #0056b3;
+}
+
+
