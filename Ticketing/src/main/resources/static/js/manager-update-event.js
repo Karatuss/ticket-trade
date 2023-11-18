@@ -18,12 +18,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.getElementById("event_remove_button").addEventListener("click", function () {
         let divElement = document.getElementById('event_remove_div');
-        divElement.style.display = 'block';
+        divElement.style.display = 'flex';
 
         document.getElementById("remove").addEventListener("click", function () {
             let Event_name = document.getElementById('event_remove').value;
-            for (const key in EventlistArray)
-            {
+            for (const key in EventlistArray) {
                 if (Event_name === EventlistArray[key].eventName) {
                     FetchRemoveEvent(EventlistArray[key].id);
                     Event_name = "";
@@ -35,34 +34,35 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-function AddEventDiv(EventList, key) { //서버로 부터 받아 온 정보를 토대로 이벤트명 + div 만드는 함수
-    const EventListDiv = document.getElementById('manage_event'); // 'event'라는 id를 가진 요소를 가져옴
-    const EventNameElement_manage = document.createElement('div'); // 새로운 div 요소를 생성
+function AddEventDiv(EventList, key) {
+    const EventListDiv = document.getElementById('manage_event');
+    const EventNameElement_manage_name = document.createElement('div');
+    const EventNameElement_manage_time = document.createElement('div');
 
-    EventNameElement_manage.id = key; // EventNameElement의 div id를 서버로부터 받아 온 eventlist의 id로 설정
-    EventNameElement_manage.classList.add('event');
+    EventNameElement_manage_name.id = key;
+    EventNameElement_manage_name.classList.add('event');
 
-    // EventNameElement에 서버로 부터 받아온 이벤트 이름을 삽입
-    EventNameElement_manage.innerHTML = ` 
-      <h2>${EventList[key].eventName}</h2>
+    EventNameElement_manage_name.innerHTML = `<h2>${EventList[key].eventName}</h2>`;
+
+    EventNameElement_manage_time.innerHTML = `
+      <h4>예매기간 : ${EventList[key].eventStart} ~ ${EventList[key].eventEnd}</h4>
     `;
 
+    EventNameElement_manage_name.appendChild(EventNameElement_manage_time);
 
-    EventNameElement_manage.addEventListener('click', function () {
-        // 이미 존재하는 자식 div 확인
+    EventNameElement_manage_name.addEventListener('click', function () {
         const existingChildDiv = document.getElementById("childDiv");
 
-        // 자식 div가 이미 존재한다면 제거
         if (existingChildDiv) {
             existingChildDiv.remove();
         } else {
-            FetchEventId_manage(EventNameElement_manage)
+            FetchEventId_manage(EventNameElement_manage_name);
         }
     });
 
-    EventListDiv.appendChild(EventNameElement_manage); // EventNameElement를 EventlistDiv의 자식 div으로 설정
-
+    EventListDiv.appendChild(EventNameElement_manage_name);
 }
+
 
 function FetchEventId_manage(ClickDiv) { //특정 이벤트명을 클릭 시 서버로 해당 div 의 eventid 전송 및 user-event-seat로 이동
 
@@ -118,7 +118,7 @@ function FetchEventId_manage(ClickDiv) { //특정 이벤트명을 클릭 시 서
         .catch(error => console.error('Error', error));
 }
 
-function FetchRemoveEvent(Event_Id){
+function FetchRemoveEvent(Event_Id) {
 
     const data_manager = {
         remove: true,

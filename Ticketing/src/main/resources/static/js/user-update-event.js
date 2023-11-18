@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
 function AddEventDiv(EventList, key, UserEventList) { //서버로 부터 받아 온 정보를 토대로 이벤트명 + div 만드는 함수
     const EventListDiv = document.getElementById('event'); // 'event'라는 id를 가진 요소를 가져옴
     const EventNameElement = document.createElement('div'); // 새로운 div 요소를 생성
+    const EventNameElement_time = document.createElement('div');
 
     EventNameElement.id = key; // EventNameElement의 div id를 서버로부터 받아 온 eventlist의 id로 설정
     EventNameElement.classList.add('event');
@@ -40,6 +41,11 @@ function AddEventDiv(EventList, key, UserEventList) { //서버로 부터 받아 
     EventNameElement.innerHTML = ` 
       <h2>${EventList[key].eventName}</h2>
     `;
+    EventNameElement_time.innerHTML = `
+      <h4>예매기간 : ${EventList[key].eventStart} ~ ${EventList[key].eventEnd}</h4>
+    `;
+
+    EventNameElement.appendChild(EventNameElement_time);
 
     //UserEventList 객체가 
     if (UserEventList.hasOwnProperty(key)) {

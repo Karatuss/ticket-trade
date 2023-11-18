@@ -4,8 +4,16 @@ document.addEventListener("DOMContentLoaded", function () {
         let eventName = document.getElementById("event_name").value;
         let event_col = document.getElementById("event_seatCol").value;
         let event_row = document.getElementById("event_seatRow").value;
+        let event_start = document.getElementById("event_startTime").value;
+        let event_end = document.getElementById("event_endTime").value;
 
-        let data = {'name': eventName, 'row': event_row, 'col': event_col};
+        let data = {
+            'eventName': eventName,
+            'row': event_row,
+            'col': event_col,
+            'eventStart': event_start,
+            'eventEnd': event_end
+        };
 
         FetchEventInfo(data);
     });
@@ -14,9 +22,11 @@ document.addEventListener("DOMContentLoaded", function () {
 function FetchEventInfo(data) {
 
     const data_event = {
-        eventName: data.name,
+        eventName: data.eventName,
         row: data.row,
-        col: data.col
+        col: data.col,
+        eventStart: data.eventStart,
+        eventEnd: data.eventEnd
     };
 
     // 파일이 JSON형식임을 명시
