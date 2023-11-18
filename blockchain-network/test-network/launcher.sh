@@ -2,11 +2,16 @@
 
 . scripts/utils.sh
 
+infoln "------------------------------------------------------------------------------------------------------------------"
+infoln "| This script needs to excute before making a communication between Blockchain network and Backend.              |"
+# infoln "|  |"
+infoln "------------------------------------------------------------------------------------------------------------------"
+
 warnln "0. Trim out some directories, files, or something for prepare the initial network environment."
 # warnln "${PWD}"
 # TODO: Control $? of rm command below
-rm -rf ${PWD}/../Gateway/wallet     # Prevent from the error, "io.grpc.StatusRuntimeException: UNKNOWN: ..."
-docker rm -f peer0seller_chaincode_ccaas peer0buyer_chaincode_ccaas 2> /dev/null
+rm -rf ${PWD}/../application-go/wallet     # Prevent from the error, "io.grpc.StatusRuntimeException: UNKNOWN: ..."
+# docker rm -f peer0seller_chaincode_ccaas peer0buyer_chaincode_ccaas 2> /dev/null
 
 
 warnln "1. Make sure the blockchain network being down."

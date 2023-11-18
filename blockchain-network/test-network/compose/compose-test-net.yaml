@@ -88,6 +88,8 @@ services:
       - CORE_CHAINCODE_EXECUTETIMEOUT=300s
     volumes:
         - ../organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com:/etc/hyperledger/fabric
+        # - ../organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com:/etc/hyperledger/fabric/admin
+        # - ../organizations/peerOrganizations/org1.example.com/users/User1@org1.example.com:/etc/hyperledger/fabric/user1
         - peer0.org1.example.com:/var/hyperledger/production
     working_dir: /root
     command: peer node start
@@ -127,6 +129,8 @@ services:
       - CORE_CHAINCODE_EXECUTETIMEOUT=300s
     volumes:
         - ../organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com:/etc/hyperledger/fabric
+        # - ../organizations/peerOrganizations/org2.example.com/users/Admin@org2.example.com:/etc/hyperledger/fabric/admin
+        # - ../organizations/peerOrganizations/org2.example.com/users/User1@org2.example.com:/etc/hyperledger/fabric/user1
         - peer0.org2.example.com:/var/hyperledger/production
     working_dir: /root
     command: peer node start
