@@ -229,7 +229,7 @@ public class PostController {
 
             // check user can't book tickets more
             JsonArray loginUserSeat = userCollection.get(loginUser).contentAsObject().getArray("seat");
-            if (loginUserSeat.get(0) != null && loginUserSeat.get(1) != null) {
+            if (loginUserSeat.size() == 2 && !loginUserSeat.getString(0).isEmpty()) {
                 seatData.put("success", false);
                 throw new IllegalArgumentException();
             }
