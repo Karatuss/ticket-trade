@@ -258,7 +258,7 @@ public class PostController {
     }
 
     // MANAGER
-    @PostMapping(value = "manager-event")
+    @PostMapping(value = "/manager-event")
     public ResponseEntity<Object> managerEvent(@RequestBody HashMap<String, Object> managerData,
                                                @SessionAttribute(name = SessionConst.LOGIN_MANAGER, required = false) String loginManager,
                                                HttpServletRequest request) {
