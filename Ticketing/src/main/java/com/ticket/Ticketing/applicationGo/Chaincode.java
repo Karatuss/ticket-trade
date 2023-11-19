@@ -59,16 +59,77 @@ public class Chaincode {
         return process.waitFor();
     }
 
-    // TODO: 1. should return JSON
-    // TODO: 2. change public to private after creating smartcontract methods
-    public int invoke(int orgNum, String fncName, String[] args) throws IOException, InterruptedException {
+    @Deprecated
+    private int invoke(int orgNum, String fncName, String[] args) throws IOException, InterruptedException {
         Command command = new Command("invoke.sh", orgNum, fncName, args);
         return makeProcessExecutingCommand(command);
     }
 
-    public int query(int orgNum, String fncName, String[] args) throws IOException, InterruptedException {
+    @Deprecated
+    private int query(int orgNum, String fncName, String[] args) throws IOException, InterruptedException {
         Command command = new Command("query.sh", orgNum, fncName, args);
         return makeProcessExecutingCommand(command);
+    }
+
+    private int letsGo(int orgNum, String fncName, String[] args) throws IOException, InterruptedException {
+        Command command = new Command("lets-go.sh", orgNum, fncName, args);
+        return makeProcessExecutingCommand(command);
+    }
+
+    public int initLedger(int orgNum) {
+        // TODO: Currently, the organization number is fixed as 1.
+        orgNum = 1;
+        try {
+            return letsGo(orgNum, "InitLedger", new String[]{});
+        } catch (IOException | InterruptedException e) {
+            System.err.println(e);
+        }
+        return 0;
+    }
+
+    public int getAllTickets(int orgNum) {
+        // TODO: Currently, the organization number is fixed as 1.
+        orgNum = 1;
+        try {
+            return letsGo(orgNum, "GetAllTickets", new String[]{});
+        } catch (IOException | InterruptedException e) {
+            System.err.println(e);
+        }
+        return 0;
+    }
+
+    public int createTicket(int orgNum, String ticketId, String eventId, int seatNum, String owner) {
+        // TODO: Currently, the organization number is fixed as 1.
+        orgNum = 1;
+        try {
+            return letsGo(orgNum, "CreateTicket",
+                    new String[]{ticketId, eventId, String.valueOf(seatNum), owner});
+        } catch (IOException | InterruptedException e) {
+            System.err.println(e);
+        }
+        return 0;
+    }
+
+    public int readTicket(int orgNum, String ticketId) {
+        // TODO: Currently, the organization number is fixed as 1.
+        orgNum = 1;
+        try {
+            return letsGo(orgNum, "ReadTicket", new String[]{ticketId});
+        } catch (IOException | InterruptedException e) {
+            System.err.println(e);
+        }
+        return 0;
+    }
+
+    public int transferTicket(int orgNum, String ticketId, String newOwner) {
+        // TODO: Currently, the organization number is fixed as 1.
+        orgNum = 1;
+        try {
+            return letsGo(orgNum, "TransferTicket", new String[]{ticketId, newOwner});
+        } catch (IOException | InterruptedException e) {
+            System.err.println(e);
+        }
+        return 0;
     }
 
 }
