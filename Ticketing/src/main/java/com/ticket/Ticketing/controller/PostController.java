@@ -7,7 +7,6 @@ import com.couchbase.client.java.json.JsonArray;
 import com.couchbase.client.java.json.JsonObject;
 import com.ticket.Ticketing.config.UserConfig;
 import com.ticket.Ticketing.domain.repository.SessionConst;
-import com.ticket.Ticketing.service.BlockChainService;
 import com.ticket.Ticketing.service.EventService;
 import com.ticket.Ticketing.service.SeatService;
 import com.ticket.Ticketing.service.UserService;
@@ -43,7 +42,6 @@ public class PostController {
     private final EventService eventService;
     private final SeatService seatService;
     private final UserService userService;
-    private final BlockChainService blockChainService;
 
     // REGISTER
     @PostMapping(value = "/register")
@@ -282,7 +280,8 @@ public class PostController {
             String eventId = String.valueOf(managerData.get("eventId"));
 
             // check whether modify ticket info
-            blockChainService.checkTicketModified(eventId);
+            //blockChainService.checkTicketModified(eventId);
+
 
             // if "remove" is "true", remove all data about eventId
             if (managerData.get("remove").equals(true)) {
