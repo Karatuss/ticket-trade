@@ -15,16 +15,19 @@
 <br>
 <!--회원가입창-->
 <div class="input-box">
-    생성할 아이디 <input type="text" id="n_ID"><br>
-    생성할 비밀번호 <input type="password" id="n_PW"><br>
-    이름 <input type="text" id="username"><br>
-    나이 <input type="number" id="age" min="0" max="100"><br>
-    이메일 <input type="email" id="email"><br>
-    성별<br>
-    <input type="radio" name="gender" value="MALE" checked> 남성
-    <input type="radio" name="gender" value="FEMALE"> 여성<br>
-    휴대폰번호 <input type="text" oninput="autoHyphen(this)" id="phoneNumber" class="phoneNumberInput" maxlength="13"
-                 required><br>
+    아이디 <label for="n_ID"></label><input type="text" id="n_ID"><br>
+    비밀번호 <label for="n_PW"></label><input type="password" id="n_PW"><br>
+    이메일 <label for="email"></label><input type="email" id="email"><br>
+    이름 <label for="username"></label><input type="text" id="username"><br>
+    나이 <label for="age"></label><input type="number" id="age" min="0" max="100"><br>
+    성별 <label>
+    <input type="radio" name="gender" value="MALE" checked>
+</label> 남성
+    <label>
+        <input type="radio" name="gender" value="FEMALE">
+    </label> 여성<br>
+    휴대폰번호 <label for="phoneNumber"></label><input type="text" oninput="autoHyphen(this)" id="phoneNumber" class="phoneNumberInput" maxlength="13"
+                                                  required><br>
     <br>
     <div class="button-container">
         <button id="submit">생성하기</button>
