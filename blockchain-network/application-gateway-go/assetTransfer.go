@@ -80,7 +80,7 @@ func main() {
 	contract := network.GetContract(chaincodeName)
 
 	// Create result.txt file for saving JSON string.
-	fo, err = os.Create(resultFile)
+	fo, err = os.OpenFile(resultFile, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
 	if err != nil {
 		panic(err)
 	}
