@@ -176,13 +176,13 @@ public class EventService {
         JsonObject eventObject = eventCollection.get(eventId).contentAsObject();
 
         LocalDateTime eventStart = LocalDateTime.parse(String.valueOf(eventObject.get("eventStart")));
+        LocalDateTime eventEnd = LocalDateTime.parse(String.valueOf(eventObject.get("eventEnd")));
 
-
-        if (currentTime.isBefore(eventStart)) {
-            eventCollection.get(eventId).contentAsObject().put("eventStatus", true);
+        if (currentTime.isAfter(eventStart) && currentTime.isBefore(eventEnd)) {
+            eventCollection.replace(eventId, eventCollection.get(eventId).contentAsObject().put("eventStatus", true));
             return true;
         } else {
-            eventCollection.get(eventId).contentAsObject().put("eventStatus", false);
+            eventCollection.replace(eventId, eventCollection.get(eventId).contentAsObject().put("eventStatus", false));
             return false;
         }
 
