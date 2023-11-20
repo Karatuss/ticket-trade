@@ -1,0 +1,36 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.google.guava:guava:31.1-jre'
+    implementation 'org.hyperledger.fabric:fabric-gateway-java:2.2.0'
+    implementation 'com.google.code.gson:gson:2.10.1'
+
+    compileOnly 'io.grpc:grpc-api:1.56.1'
+    runtimeOnly 'io.grpc:grpc-netty-shaded:1.56.1'
+}
+
+ext {
+    javaMainClass = "com.ticket.Ticketing.gateway.App"	// TEST
+}
+
+application {
+    mainClass = 'com.ticket.Ticketing.gateway.App'	// TEST
+}
+
+// task for running the app after building dependencies
+tasks.register('runApp', Exec) {
+    dependsOn build
+    group = "Execution"
+    description = "Run the main class with ExecTask"
+    commandLine "java", "-classpath", sourceSets.main.runtimeClasspath.getAsPath(), javaMainClass
+}
