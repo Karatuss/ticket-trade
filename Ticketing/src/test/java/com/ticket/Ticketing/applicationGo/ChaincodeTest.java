@@ -1,10 +1,11 @@
 package com.ticket.Ticketing.applicationGo;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
+import com.ticket.Ticketing.dto.TicketDto;
+import org.junit.jupiter.api.*;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -12,10 +13,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class ChaincodeTest {
 
-    private Chaincode chaincode;
+    private static Chaincode chaincode;
 
-    @Test
-    void constructorWorksProperly() throws IOException, InterruptedException {
+    @BeforeAll
+    static void constructorWorksProperly() throws IOException {
         // load blockchain properties file
         String blockchainConfigPath = Thread.currentThread().getContextClassLoader().getResource("blockchain.properties").getPath();
 
@@ -27,33 +28,60 @@ class ChaincodeTest {
 
         // execute constructor
         chaincode = new Chaincode(blockchainChannelName, blockchainContractBasic);
-
         assertNotNull(chaincode, "chaincode is not generated");
+
+        // InitLedger call
+        int exitCode = chaincode.initLedger(1);
+        assertEquals(exitCode, 0);
     }
 
-//    @Disabled
-//    @AfterEach
-//    void invokeTest() throws IOException, InterruptedException {
-//        //given
-//        assertNotNull(chaincode);
-//
-//        //when
-//        int exitCode = chaincode.invoke(1, "InitLedger", new String[]{""});
-//
-//        //then
-//        assertEquals(exitCode, 0);
-//    }
+    @Test
+    void readTicketExist() {
+        // TODO: check the result text is intended text.
+        int exitCode = chaincode.readTicket(1, "ticket1");
+
+        assertEquals(exitCode, 0);
+    }
+
+    @Test
+    void readTicketButNotExist() {
+        // TODO: check the result text is intended text.
+        int exitCode = chaincode.readTicket(1, "ticket1111111111");
+
+        assertEquals(exitCode, 0);
+    }
+
+    @Test
+    void getAllTickets() {
+        // TODO: check the result text is intended text.
+        int exitCode = chaincode.getAllTickets(1);
+
+        assertEquals(exitCode, 0);
+    }
+
+    @Test
+    void createTicket() {
+        // TODO: check the result text is intended text.
+        chaincode.createTicket(1, "ticket3", "2", 2, "me");
+        int exitCode = chaincode.readTicket(1, "ticket3");
+
+        assertEquals(exitCode, 0);
+    }
+
+    @Test
+    void transferTicket() {
+        // TODO: check the result text is intended text.
+        chaincode.transferTicket(1, "ticket3", "you");
+        int exitCode = chaincode.readTicket(1, "ticket3");
+
+        assertEquals(exitCode, 0);
+    }
 
     @AfterEach
-    void queryTest() throws IOException, InterruptedException {
-        //given
-        assertNotNull(chaincode);
-
-        //when
-//        int exitCode = chaincode.query(1, "ReadAsset", new String[]{""});
-        int exitCode = chaincode.query(1, "InitLedger", new String[]{""});
-
-        //then
-        assertEquals(exitCode, 0);
+    void tearDown() {
+        List<TicketDto> ticketDtoList = chaincode.getResult();
+        for (TicketDto ticket: ticketDtoList) {
+            System.out.println(ticket.toString());
+        }
     }
 }
