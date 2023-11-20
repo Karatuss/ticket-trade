@@ -4,7 +4,7 @@
 . scripts/setEnv.sh
 
 # setGlobals $1
-setGlobals 1
+shift
 
 set -x
 fcn_name=$1
