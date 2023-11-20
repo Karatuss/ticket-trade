@@ -1,4 +1,4 @@
-module blockchain-network
+module github.com/TwoPair/ticket-trade/blockchain-network/application-go
 
 go 1.20
 

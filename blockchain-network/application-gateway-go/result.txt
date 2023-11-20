@@ -1,14 +1,6 @@
-[
-  {
-    "TicketID": "ticket1",
-    "EventID": "1",
-    "SeatNumber": "1-001:001",
-    "Owner": "hyeonmin"
-  },
-  {
-    "TicketID": "ticket2",
-    "EventID": "1",
-    "SeatNumber": "1-004:024",
-    "Owner": "testid2"
-  }
-]
+{
+  "ticketID": "ticket1",
+  "eventID": "1",
+  "seatNum": "1-001:001",
+  "owner": "testid1"
+}

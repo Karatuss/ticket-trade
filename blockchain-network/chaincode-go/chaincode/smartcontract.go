@@ -13,17 +13,17 @@ type SmartContract struct {
 }
 
 type Asset struct {
-	ID			string	`json:"TicketID"`
-	EventID		string	`json:"EventID"`
-	SeatNum		string	`json:"SeatNumber"`
-	Owner		string	`json:"Owner"`
+	TicketID string `json:"ticketID"`
+	EventID  string `json:"eventID"`
+	SeatNum  string `json:"seatNum"`
+	Owner    string `json:"owner"`
 }
 
 // InitLedger adds a base set of assets to the ledger
 func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) error {
 	assets := []Asset{
-		{ID: "ticket1", EventID: "1", SeatNum: "1-001:001", Owner: "testid1"},
-		{ID: "ticket2", EventID: "1", SeatNum: "1-004:024", Owner: "testid2"},
+		{TicketID: "ticket1", EventID: "1", SeatNum: "1-001:001", Owner: "testid1"},
+		{TicketID: "ticket2", EventID: "1", SeatNum: "1-004:024", Owner: "testid2"},
 	}
 
 	for _, asset := range assets {
@@ -32,7 +32,7 @@ func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) 
 			return err
 		}
 
-		err = ctx.GetStub().PutState(asset.ID, assetJSON)
+		err = ctx.GetStub().PutState(asset.TicketID, assetJSON)
 		if err != nil {
 			return fmt.Errorf("failed to put to world state. %v", err)
 		}
@@ -52,10 +52,10 @@ func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface,
 	}
 
 	asset := Asset{
-		ID:      id,
-		EventID: eventId,
-		SeatNum: seatNum,
-		Owner:   owner,
+		TicketID: id,
+		EventID:  eventId,
+		SeatNum:  seatNum,
+		Owner:    owner,
 	}
 	assetJSON, err := json.Marshal(asset)
 	if err != nil {
@@ -96,10 +96,10 @@ func (s *SmartContract) UpdateAsset(ctx contractapi.TransactionContextInterface,
 
 	// overwriting original asset with new asset
 	asset := Asset{
-		ID:      id,
-		EventID: eventId,
-		SeatNum: seatNum,
-		Owner:   owner,
+		TicketID: id,
+		EventID:  eventId,
+		SeatNum:  seatNum,
+		Owner:    owner,
 	}
 	assetJSON, err := json.Marshal(asset)
 	if err != nil {
