@@ -7,8 +7,10 @@ import com.couchbase.client.java.json.JsonArray;
 import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.query.QueryOptions;
 import com.couchbase.client.java.query.QueryResult;
+import com.ticket.Ticketing.applicationGo.Chaincode;
 import com.ticket.Ticketing.config.EventConfig;
 import com.ticket.Ticketing.config.UserConfig;
+import com.ticket.Ticketing.dto.TicketDto;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -132,12 +134,13 @@ public class EventService {
         return eventList;
     }
 
-    public List<String> eventParticipantsList(String eventId) {
+    public List<String> eventParticipantsList(String eventId, TicketService ticketService, Chaincode chaincode) {
         Bucket userBucket = cluster.bucket(UserConfig.getStaticBucketName());
         Collection userCollection = userBucket.defaultCollection();
 
         List<String> stringList = new ArrayList<>();
 
+        // get all user info from `user_bucket`
         String query = "SELECT * FROM " + "`" + UserConfig.getStaticBucketName() + "` WHERE id";
         QueryResult result = cluster.query(query, QueryOptions.queryOptions());
 
@@ -145,11 +148,30 @@ public class EventService {
             Object seat = result.rowsAsObject().get(i).getObject("user_bucket").getArray("seat").get(0);
             if (seat != null) {
                 String event = seat.toString().split("-")[0];
+                // check an event of users' ticket is same with manager's event
                 if (event.equals(eventId)) {
                     String userID = String.valueOf(result.rowsAsObject().get(i).getObject("user_bucket").get("id"));
                     JsonObject content = userCollection.get(userID).contentAsObject();
                     String userId = String.valueOf(content.get("id"));
+
+                    String ticketId = String.valueOf(content.getArray("seat").get(0)).split("-")[1].replace(":", "");
+                    List<TicketDto> ticketDtos = new ArrayList<>();
+                    if (ticketService.ticketVerify(chaincode, ticketId, eventId, ticketId, userID) != null) {
+                        ticketDtos = ticketService.ticketVerify(chaincode, ticketId, eventId, ticketId, userID);
+                    }
+
+                    if (content.getArray("seat").size() == 2) {
+                        String ticketId2 = String.valueOf(content.getArray("seat").get(1)).split("-")[1].replace(":", "");
+                        if (ticketService.ticketVerify(chaincode, ticketId2, eventId, ticketId2, userID).get(0) != null) {
+                            ticketDtos.add(ticketService.ticketVerify(chaincode, ticketId2, eventId, ticketId2, userID).get(0));
+                        }
+                    }
+
+                    HashMap<String, List<TicketDto>> ticketInfo = new HashMap<>();
+                    ticketInfo.put("certificated", ticketDtos);
+
                     stringList.add(String.valueOf(userCollection.get(userId).contentAsObject()));
+                    stringList.add(String.valueOf(ticketInfo));
                 }
             }
         }
