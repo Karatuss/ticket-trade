@@ -118,10 +118,11 @@ function FetchEventId_manage(ClickDiv) { //특정 이벤트명을 클릭 시 서
                     var count = matches ? matches.length : 0;
 
                     if(list.seat.length == count)
-                        if(data.eventParticipantsList[j+1] != null)
-                            alert('인증이 완료되었습니다.');
-                        else
-                            alert(`인증이 실패하였습니다. \n(error:ticket was modified, user ID: ${list.id})`);
+                        alert('인증이 완료되었습니다.');
+                        // if(data.eventParticipantsList[j+1] != null)
+                        //     alert('인증이 완료되었습니다.');
+                        // else
+                        //     alert(`인증이 실패하였습니다. \n(error:ticket was modified, user ID: ${list.id})`);
                     else
                         alert(`인증이 실패하였습니다.\n(error:exist uncertificated ticket, user ID: ${list.id})`);
 
