@@ -108,11 +108,11 @@ public class Chaincode {
         return 0;
     }
 
-    public int createTicket(int orgNum, String ticketId, String eventId, int seatNum, String owner) {
+    public int createTicket(int orgNum, String ticketId, String eventId, String seatNum, String owner) {
         // TODO: Currently, the organization number is fixed as 1.
         orgNum = 1;
         try {
-            return letsGo(orgNum, "CreateTicket", new String[]{ticketId, eventId, String.valueOf(seatNum), owner});
+            return letsGo(orgNum, "CreateTicket", new String[]{ticketId, eventId, seatNum, owner});
         } catch (IOException | InterruptedException e) {
             System.err.println(e);
         }
