@@ -62,8 +62,17 @@ class ChaincodeTest {
     @Test
     void createTicket() {
         // TODO: check the result text is intended text.
-        chaincode.createTicket(1, "ticket3", "2", 2, "me");
+        chaincode.createTicket(1, "ticket3", "2", "2", "me");
         int exitCode = chaincode.readTicket(1, "ticket3");
+
+        assertEquals(exitCode, 0);
+    }
+
+    @Test
+    void createTicket2() {
+        // TODO: check the result text is intended text.
+        chaincode.createTicket(1, "ticket1000", "2", "2", "me");
+        int exitCode = chaincode.readTicket(1, "ticket1000");
 
         assertEquals(exitCode, 0);
     }
