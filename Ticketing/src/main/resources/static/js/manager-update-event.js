@@ -95,7 +95,7 @@ function FetchEventId_manage(ClickDiv) { //특정 이벤트명을 클릭 시 서
 
                 const childDiv = document.createElement("div");
                 childDiv.id = "childDiv";
-                for (let j = 0; j < data.eventParticipantsList.length; j++) {
+                for (let j = 0; j < data.eventParticipantsList.length; j+=2) {
                     // Initialize the array if not already defined
                     let list = JSON.parse(data.eventParticipantsList[j]);
 
@@ -108,8 +108,27 @@ function FetchEventId_manage(ClickDiv) { //특정 이벤트명을 클릭 시 서
                                 list_seatId = parseInt(list.seat[i].match(/\d{3}$/), 10);
                     }
 
+
+                    // 주어진 문자열
+                    var targetString = data.eventParticipantsList[j+1];
+
+                    var regex = /TicketDto/g;
+                    var matches = targetString.match(regex);
+
+                    var count = matches ? matches.length : 0;
+
+                    if(list.seat.length == count)
+                        if(data.eventParticipantsList[j+1] != null)
+                            alert('인증이 완료되었습니다.');
+                        else
+                            alert(`인증이 실패하였습니다. \n(error:ticket was modified, user ID: ${list.id})`);
+                    else
+                        alert(`인증이 실패하였습니다.\n(error:exist uncertificated ticket, user ID: ${list.id})`);
+
                     childDiv.innerHTML += `Seat Number: ${list_seatId} <br>ID: ${list.id}, Phone Number: ${list.phoneNumber} <br>`;
                 }
+
+
 
                 ClickDiv.appendChild(childDiv);
             }
