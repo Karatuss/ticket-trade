@@ -1,17 +1,3 @@
-<!--
-*** Thanks for checking out the Best-README-Template. If you have a suggestion
-*** that would make this better, please fork the ticket-trade and create a pull request
-*** or simply open an issue with the tag "enhancement".
-*** Thanks again! Now go create something AMAZING! :D
-***
-***
-***
-*** To avoid retyping too much info. Do a search and replace for the following:
-*** TwoPair, ticket-trade, twitter_handle, shm1193@gmail.com, Ticket Trade, 캡스톤 디자인 프로젝트 (이후 내용 추가하기)
--->
-
-
-
 <!-- PROJECT SHIELDS -->
 <!--
 *** I'm using markdown "reference style" links for readability.
@@ -85,18 +71,20 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+These days, concerts or big events opend by famous celebrities have worried about scalpers.
 
-Here's a blank template to get started:
-**To avoid retyping too much info. Do a search and replace with your text editor for the following:**
-`TwoPair`, `ticket-trade`, `twitter_handle`, `shm1193@gmail.com`, `Ticket Trade`, `캡스톤 디자인 프로젝트 (이후 내용 추가하기)`
+The users who try to catch a ticket get into online ticketing service, such as Interpark Ticket, may experience that they were not able to get a ticket and found some scalped tickets which were illegally gathered with macro programs.
+
+The problem is they cannot get a scalped ticket even if they pay for it. It is a scam, but there is no law to protect them.
+
+<br>
+
+So, **we thought we need to make a ticketing service with prevent users who use our service from scalpers at most before the law creates**.
 
 
 ### Built With
 
-* []()
-* []()
-* []()
+* [Hyperledger Fabric](https://github.com/hyperledger/fabric)
 
 
 
@@ -105,53 +93,81 @@ Here's a blank template to get started:
 
 To get a local copy up and running follow these simple steps.
 
+### ***🚨 Alert!! This project is working only on MAC environment!! 🚨***
+
 ### Prerequisites
 
-Please follow the official hyperledger-fabric document.
-[https://hyperledger-fabric.readthedocs.io/en/latest/prereqs.html](https://hyperledger-fabric.readthedocs.io/en/latest/prereqs.html)
-
-- Hyperledger fabric 2.5.0
+Program versions which maintainers' use.
+- Hyperledger fabric 2.5.4
 - Docker Desktop 4.23.0
 - Spring boot 3.1.4
 - Java 17
-- **여타 다른거 추가하기**
 
-#### CouchBase Setting
+1. Download Java 17 or higher.
 
-- Docker
+2. Install prerequisites with following the link below.
+
+[https://hyperledger-fabric.readthedocs.io/en/release-2.5/prereqs.html](https://hyperledger-fabric.readthedocs.io/en/release-2.5/prereqs.html)
+
+3. Install the required fabric docker images, and binary.
+
+[https://hyperledger-fabric.readthedocs.io/en/release-2.5/install.html](https://hyperledger-fabric.readthedocs.io/en/release-2.5/install.html)
+
+When you run `./install-fabric.sh`, please specify the version of fabric 2.5.4.
+
+```sh
+./install-fabric.sh --fabric-version 2.5.4 docker
 ```
-docker run -d --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase:community-6.5.0
-```
+<!-- ./install-fabric.sh --fabric-version 2.5.4 docker binary -->
 
-- IntelliJ IDEA
-  - Run > Edit Configurations > Modify Options > ☑️ Add VM options 
-  - INPUT
-    ```
-    -Dcom.sun.management.jmxremote.port=9000 
-    -Dcom.sun.management.jmxremote.authenticate=false 
-    -Dcom.sun.management.jmxremote.ssl=false
-    ```
+4. CouchBase setting for backend.
 
-### Installation
+   - Docker (run the command below on shell)
+     ```bash
+     docker run -d --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase:community-6.5.0
+     ```
+    
+   - IntelliJ IDEA
+     - Run > Edit Configurations > Modify Options > ☑️ Add VM options 
+     - INPUT
+       ```
+       -Dcom.sun.management.jmxremote.port=9000 
+       -Dcom.sun.management.jmxremote.authenticate=false 
+       -Dcom.sun.management.jmxremote.ssl=false
+       ```
+       <img width="1152" alt="Screenshot 2023-11-28 at 6 09 20 PM" src="https://github.com/TwoPair/ticket-trade/assets/39588815/8461a528-af9f-4026-a7cf-8522816366d9">
+       <img width="456" alt="Screenshot 2023-11-28 at 6 10 10 PM" src="https://github.com/TwoPair/ticket-trade/assets/39588815/8f4ef876-a2b1-40cc-a006-e8c34fe4ec6a">
+       <img width="703" alt="Screenshot 2023-11-28 at 6 11 07 PM" src="https://github.com/TwoPair/ticket-trade/assets/39588815/6838cafa-54c7-46d8-a850-9bc832225cd0">
 
-1. Clone the ticket-trade
+
+### Clone & Run
+
+1. Clone the ticket-trade where you want to work in.
    ```sh
    git clone https://github.com/TwoPair/ticket-trade.git
    ```
-2. Run the launcher **만드는 중. 최종적으로 바이너리 실행파일 형식으로 할 예정!**
+2. Run the following command to remove any containers or artifacts from any previous runs.
    ```sh
+   cd blockchain-network/test-network
+   ./network.sh down
    ./launcher.sh
    ```
-
+   
+3. Open `ticket-trade/Ticketing` folder with **IntelliJ**, selecet `Ticketing.java` file, and let's run it.
 
 
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+1. User
+   - If you login normally, you can face a event selection page.
+   - Check and get inside a event you want to reserve, select seats and click the reservation button.
+   - You can see your reservation in the event.
 
-<!-- 위키도 구성해보면 좋을 듯 -->
-_For more examples, please refer to the [Documentation](https://example.com)_
+2. Manager
+   - The admin gives you this accout when you want to create your own event.
+   - After login with this accout, you can make an event and set options.
+   - If users book your event, you can check who reserves.
 
 
 
@@ -191,17 +207,6 @@ Youngrae Kim - kyrae604@naver.com
 Sooeung Im   - dlatndmd7@naver.com
 
 Project Link: [https://github.com/TwoPair/ticket-trade](https://github.com/TwoPair/ticket-trade)
-
-
-
-<!-- ACKNOWLEDGEMENTS -->
-## Acknowledgements
-
-* []()
-* []()
-* []()
-
-
 
 
 
